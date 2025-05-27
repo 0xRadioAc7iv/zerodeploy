@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { simpleGit } from "simple-git";
 import path from "path";
-import { RequestBody, uploadDirectory } from "./utils.ts";
+import { pushMessageToSQS, RequestBody, uploadDirectoryToS3 } from "./utils.ts";
 import { GITHUB_URL, __dirname } from "./constants.ts";
 import { rm } from "fs/promises";
 
@@ -40,12 +40,15 @@ app.post("/upload", async (request, reply) => {
   await simpleGit().clone(repositoryUrl, repoPath);
 
   // Upload the files to S3 bucket
-  await uploadDirectory(id, repoPath);
+  await uploadDirectoryToS3(id, repoPath);
+
+  // Push Message to SQS
+  await pushMessageToSQS(id);
 
   // Deletes the local repo
   await rm(repoPath, { recursive: true, force: true });
 
-  reply.code(200).send({});
+  reply.code(200).send({ id });
 });
 
 app.setErrorHandler((error, request, reply) => {

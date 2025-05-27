@@ -1,9 +1,10 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { readdir, readFile } from "fs/promises";
 import path from "path";
-import { AWS_S3_BUCKET_NAME } from "./env.ts";
-import { s3 } from "./aws.ts";
+import { AWS_S3_BUCKET_NAME, AWS_SQS_QUEUE_URL } from "./env.ts";
+import { s3, sqs } from "./aws.ts";
 import { z } from "zod";
+import { SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export const RequestBody = z.object({
   repositoryUrl: z.string(),
@@ -30,7 +31,11 @@ const getAllFiles = async (
   return fileList;
 };
 
-const uploadFile = async (id: string, localPath: string, baseDir: string) => {
+const uploadFileToS3 = async (
+  id: string,
+  localPath: string,
+  baseDir: string
+) => {
   const fileContent = await readFile(localPath);
   const relativePath = path.relative(baseDir, localPath).replace(/\\/g, "/");
 
@@ -45,9 +50,19 @@ const uploadFile = async (id: string, localPath: string, baseDir: string) => {
   await s3.send(command);
 };
 
-export const uploadDirectory = async (id: string, dir: string) => {
+export const uploadDirectoryToS3 = async (id: string, dir: string) => {
   const files = await getAllFiles(dir);
   for (const file of files) {
-    await uploadFile(id, file, dir);
+    await uploadFileToS3(id, file, dir);
   }
+};
+
+export const pushMessageToSQS = async (id: string) => {
+  const sendCommand = new SendMessageCommand({
+    QueueUrl: AWS_SQS_QUEUE_URL,
+    MessageGroupId: "user_id",
+    MessageBody: JSON.stringify({ id }),
+  });
+
+  sqs.send(sendCommand);
 };

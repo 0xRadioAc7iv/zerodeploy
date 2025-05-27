@@ -19,3 +19,8 @@ export const AWS_S3_BUCKET_NAME = env
   .get("AWS_S3_BUCKET_NAME")
   .required()
   .asString();
+
+export const AWS_SQS_QUEUE_URL = env
+  .get("AWS_SQS_QUEUE_URL")
+  .required()
+  .asString();
