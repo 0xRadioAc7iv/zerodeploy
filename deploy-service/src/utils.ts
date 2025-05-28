@@ -59,7 +59,9 @@ export async function buildRepo(id: string) {
     await execAsync("npm install", { cwd: repoPath });
 
     console.log(`Running build in ${repoPath}...`);
-    await execAsync("npm run build", { cwd: repoPath });
+    await execAsync(`npm run build -- --base=/user/builds/${id}/`, {
+      cwd: repoPath,
+    });
 
     console.log(`✅ Build complete for repo ${id}`);
   } catch (error) {

@@ -6,6 +6,9 @@ import {
 } from "@aws-sdk/client-sqs";
 import { AWS_SQS_QUEUE_URL } from "./env.ts";
 import { buildRepo, fetchFilesFromS3, uploadBuiltFolderToS3 } from "./utils.ts";
+import { rm } from "fs/promises";
+import path from "path";
+import { __dirname } from "./constants.ts";
 
 const app = Fastify();
 
@@ -29,12 +32,13 @@ async function pollSQSForMessages() {
       const { id } = JSON.parse(message.Body as string);
 
       await fetchFilesFromS3(id);
-      // Build project
       await buildRepo(id);
-      // Upload back to S3
       await uploadBuiltFolderToS3(id);
 
-      // await rm(`repo/${id}`, { recursive: true, force: true });
+      await rm(path.join(__dirname, `repo/${id}`), {
+        recursive: true,
+        force: true,
+      });
 
       await sqs.send(
         new DeleteMessageCommand({
