@@ -104,14 +104,7 @@ export default function NewProjectPage() {
               key={repo.id}
               className="p-4 border rounded-xl hover:shadow-md transition"
             >
-              <a
-                href={repo.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 font-medium text-lg hover:underline"
-              >
-                {repo.name}
-              </a>
+              <div className="text-xl font-bold">{repo.name}</div>
               {repo.private && (
                 <span className="ml-2 inline-block text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
                   Private

@@ -7,12 +7,17 @@ export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
   const repoUrl = searchParams.get("repo_url");
 
-  const [framework, setFramework] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [framework, setFramework] = useState<string | null>(null);
+  const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
+  const [installCommand, setInstallCommand] = useState("");
+  const [buildCommand, setBuildCommand] = useState("");
+  const [outputDirectory, setOutputDirectory] = useState("");
+
   useEffect(() => {
-    async function detectFramework() {
+    async function detectRepoDetails() {
       if (!repoUrl) return;
 
       setLoading(true);
@@ -20,12 +25,16 @@ export default function ImportNewRepositoryPage() {
 
       try {
         const res = await fetch(
-          `/api/github/files?repo_url=${encodeURIComponent(repoUrl)}`
+          `/api/github/info?repo_url=${encodeURIComponent(repoUrl)}`
         );
-        if (!res.ok) throw new Error("Framework detection failed");
+        if (!res.ok) throw new Error("Failed to analyze repository");
 
         const data = await res.json();
-        setFramework(data.framework ?? "Unknown");
+        setFramework(data.framework);
+        setDefaultBranch(data.defaultBranch ?? "main");
+        setInstallCommand(data.installCommand ?? "");
+        setBuildCommand(data.buildCommand ?? "");
+        setOutputDirectory(data.outputDirectory ?? "");
       } catch (err: any) {
         setError(err.message || "Unexpected error");
       } finally {
@@ -33,24 +42,63 @@ export default function ImportNewRepositoryPage() {
       }
     }
 
-    detectFramework();
+    detectRepoDetails();
   }, [repoUrl]);
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Import Repository</h1>
 
-      {repoUrl && <p className="text-gray-600 mb-2">Repo: {repoUrl}</p>}
+      {repoUrl && (
+        <p className="text-gray-600 mb-2">
+          Repo: {repoUrl}
+          {defaultBranch && (
+            <span className="ml-2 text-sm text-gray-500">
+              (branch: {defaultBranch})
+            </span>
+          )}
+        </p>
+      )}
 
       {loading && <p className="text-gray-500">Analyzing repository...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
       {!loading && framework && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-4">
           <p className="text-lg">
             Detected Framework:{" "}
             <span className="font-semibold">{framework}</span>
           </p>
+
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium">Install Command</label>
+            <input
+              type="text"
+              className="border p-2 rounded-md"
+              value={installCommand}
+              onChange={(e) => setInstallCommand(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium">Build Command</label>
+            <input
+              type="text"
+              className="border p-2 rounded-md"
+              value={buildCommand}
+              onChange={(e) => setBuildCommand(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium">Output Directory</label>
+            <input
+              type="text"
+              className="border p-2 rounded-md"
+              value={outputDirectory}
+              onChange={(e) => setOutputDirectory(e.target.value)}
+            />
+          </div>
         </div>
       )}
     </div>
