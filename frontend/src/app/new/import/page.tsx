@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -16,6 +17,24 @@ export default function ImportNewRepositoryPage() {
   const [buildCommand, setBuildCommand] = useState("");
   const [outputDirectory, setOutputDirectory] = useState("");
 
+  async function handleDeployRepo() {
+    const response = await fetch("/api/deploy", {
+      method: "POST",
+      body: JSON.stringify({
+        repoUrl,
+        defaultBranch,
+        framework,
+        installCommand,
+        buildCommand,
+        outputDirectory,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Failed to deploy");
+    }
+  }
+
   useEffect(() => {
     async function detectRepoDetails() {
       if (!repoUrl) return;
@@ -31,10 +50,10 @@ export default function ImportNewRepositoryPage() {
 
         const data = await res.json();
         setFramework(data.framework);
-        setDefaultBranch(data.defaultBranch ?? "main");
-        setInstallCommand(data.installCommand ?? "");
-        setBuildCommand(data.buildCommand ?? "");
-        setOutputDirectory(data.outputDirectory ?? "");
+        setDefaultBranch(data.defaultBranch);
+        setInstallCommand(data.installCommand);
+        setBuildCommand(data.buildCommand);
+        setOutputDirectory(data.outputDirectory);
       } catch (err: any) {
         setError(err.message || "Unexpected error");
       } finally {
@@ -50,14 +69,21 @@ export default function ImportNewRepositoryPage() {
       <h1 className="text-2xl font-semibold mb-4">Import Repository</h1>
 
       {repoUrl && (
-        <p className="text-gray-600 mb-2">
-          Repo: {repoUrl}
-          {defaultBranch && (
-            <span className="ml-2 text-sm text-gray-500">
-              (branch: {defaultBranch})
-            </span>
-          )}
-        </p>
+        <div>
+          <p>Importing from Github</p>
+          <p className="text-gray-600 mb-2">
+            <Link href={repoUrl} target="_blank">
+              Repo: {repoUrl}
+            </Link>
+            {defaultBranch && (
+              <Link href={repoUrl} target="_blank">
+                <span className="ml-2 text-sm text-gray-500">
+                  (branch: {defaultBranch})
+                </span>
+              </Link>
+            )}
+          </p>
+        </div>
       )}
 
       {loading && <p className="text-gray-500">Analyzing repository...</p>}
@@ -99,6 +125,12 @@ export default function ImportNewRepositoryPage() {
               onChange={(e) => setOutputDirectory(e.target.value)}
             />
           </div>
+          <button
+            className="border-2 px-2 py-1 rounded-md cursor-pointer"
+            onClick={handleDeployRepo}
+          >
+            Deploy
+          </button>
         </div>
       )}
     </div>

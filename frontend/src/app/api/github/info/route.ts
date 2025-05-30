@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
   const hasYarn = paths.includes("yarn.lock");
   const packageManager = hasPnpm ? "pnpm" : hasYarn ? "yarn" : "npm";
 
-  const buildCommand = isVite ? "vite build" : `${packageManager} run build`;
+  const buildCommand = `${packageManager} run build`;
   const installCommand = `${packageManager} install`;
   const outputDirectory = "dist";
 
