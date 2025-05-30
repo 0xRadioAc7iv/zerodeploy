@@ -4,6 +4,7 @@ import { deployRequestBody } from "@/lib/zod";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
     new SendMessageCommand({
       QueueUrl: process.env.AWS_SQS_QUEUE_URL,
       MessageGroupId: session.user.id,
+      MessageDeduplicationId: randomUUID(),
       MessageBody: JSON.stringify(data),
     })
   );

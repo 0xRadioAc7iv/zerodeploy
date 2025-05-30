@@ -1,74 +1,16 @@
-import {
-  GetObjectCommand,
-  ListObjectsV2Command,
-  PutObjectCommand,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "./aws.ts";
 import { AWS_S3_BUCKET_NAME } from "./env.ts";
 import path from "path";
-import { __dirname } from "./constants.ts";
-import { mkdir, open, readdir, readFile } from "fs/promises";
-import { pipeline } from "stream";
+import { readdir, readFile } from "fs/promises";
+import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import { exec } from "child_process";
+import { createReadStream, createWriteStream } from "fs";
+import unzipper from "unzipper";
 
 const execAsync = promisify(exec);
-const streamPipeline = promisify(pipeline);
-
-export async function fetchFilesFromS3(id: string) {
-  const { Contents } = await s3.send(
-    new ListObjectsV2Command({
-      Bucket: AWS_S3_BUCKET_NAME,
-      Prefix: `user/${id}`,
-    })
-  );
-
-  if (!Contents) return;
-
-  for (const file of Contents) {
-    const s3Key = file.Key as string;
-    const relativePath = s3Key.replace(`user/${id}`, "");
-    const localPath = path.join(__dirname, "repo", id, relativePath);
-    const dirPath = path.dirname(localPath);
-
-    await mkdir(dirPath, { recursive: true });
-
-    const { Body } = await s3.send(
-      new GetObjectCommand({
-        Bucket: AWS_S3_BUCKET_NAME,
-        Key: s3Key,
-      })
-    );
-
-    const writeStream = await open(localPath, "w");
-    await streamPipeline(
-      Body?.transformToWebStream()!,
-      writeStream.createWriteStream()
-    );
-    await writeStream.close();
-
-    console.log(`Downloaded ${s3Key} → ${localPath}`);
-  }
-}
-
-export async function buildRepo(id: string) {
-  const repoPath = path.join(__dirname, "repo", id);
-
-  try {
-    console.log(`Installing dependencies in ${repoPath}...`);
-    await execAsync("npm install", { cwd: repoPath });
-
-    console.log(`Running build in ${repoPath}...`);
-    await execAsync(`npm run build -- --base=/user/builds/${id}/`, {
-      cwd: repoPath,
-    });
-
-    console.log(`✅ Build complete for repo ${id}`);
-  } catch (error) {
-    console.error(`❌ Build failed for repo ${id}:`, error);
-    throw error;
-  }
-}
+const pipelineAsync = promisify(pipeline);
 
 function getContentType(filename: string) {
   const ext = path.extname(filename).toLowerCase();
@@ -115,13 +57,45 @@ async function uploadDirectoryToS3(localDir: string, s3Prefix: string) {
   }
 }
 
-export async function uploadBuiltFolderToS3(id: string) {
-  const localDistPath = path.join(__dirname, "repo", id, "dist");
-  const s3Prefix = `user/builds/${id}/`;
+export async function uploadBuiltFolderToS3(
+  outputDestination: string,
+  repo: string
+) {
+  const s3Prefix = `builds/${repo}/`; // TODO: ADD USERNAME BEFORE REPO NAME
 
   console.log(
-    `Uploading ${localDistPath} → s3://${AWS_S3_BUCKET_NAME}/${s3Prefix}`
+    `Uploading ${outputDestination} → s3://${AWS_S3_BUCKET_NAME}/${s3Prefix}`
   );
-  await uploadDirectoryToS3(localDistPath, s3Prefix);
-  console.log(`✅ Upload complete for repo ${id}`);
+  await uploadDirectoryToS3(outputDestination, s3Prefix);
+  console.log(`✅ Upload complete for repo ${outputDestination}`);
+}
+
+export function parseGitHubUrl(url: string) {
+  const match = url.match(/github\.com\/([^/]+)\/([^/]+)(\.git)?/);
+  if (!match) throw new Error("Invalid GitHub URL");
+  return { owner: match[1], repo: match[2].replace(/\.git$/, "") };
+}
+
+export async function downloadFile(url: string, destPath: string) {
+  const res = await fetch(url);
+
+  if (!res.ok)
+    throw new Error(`Failed to download: ${res.status} ${res.statusText}`);
+
+  const nodeReadable = Readable.fromWeb(res.body as any);
+  await pipelineAsync(nodeReadable, createWriteStream(destPath));
+}
+
+export async function unzip(zipPath: string, destPath: string) {
+  await pipelineAsync(
+    createReadStream(zipPath),
+    unzipper.Extract({ path: destPath })
+  );
+}
+
+export async function runCommand(command: string, cwd: string) {
+  console.log(`> ${command}`);
+  const { stdout, stderr } = await execAsync(command, { cwd });
+  if (stdout) console.log(stdout);
+  if (stderr) console.error(stderr);
 }
