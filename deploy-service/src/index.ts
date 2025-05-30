@@ -91,4 +91,8 @@ async function pollSQSForMessages() {
   }
 }
 
-app.listen({ port: 4000 }, () => pollSQSForMessages());
+app.get("/check", (_, reply) => {
+  reply.code(200).send();
+});
+
+app.listen({ port: 4000, host: "0.0.0.0" }, () => pollSQSForMessages());
