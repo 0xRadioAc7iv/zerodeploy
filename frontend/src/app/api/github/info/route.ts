@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
   if (!match)
     return NextResponse.json({ error: "Invalid GitHub URL" }, { status: 400 });
 
-  const [_, owner, repo] = match;
+  const owner = match[1];
+  const repo = match[2];
 
   const repoMetaRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}`,
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
   }
 
   const data = await treeRes.json();
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const paths: string[] = data.tree?.map((item: any) => item.path) ?? [];
 
   const isVite = paths.some((path) =>

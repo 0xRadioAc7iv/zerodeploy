@@ -34,21 +34,24 @@ export default function Home() {
     <div>
       {status === "loading" && <div>Loading...</div>}
       {status === "unauthenticated" ? (
-        <button
-          className="flex items-center gap-3 px-6 py-3 bg-primary border-white border text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 cursor-pointer"
-          onClick={handleLogin}
-          disabled={loading}
-          aria-label="Sign in with Github"
-        >
-          {loading ? (
-            <span className="animate-pulse text-sm">Loading...</span>
-          ) : (
-            <>
-              <FaGithub className="size-5" />
-              Continue with Google
-            </>
-          )}
-        </button>
+        <div className="flex flex-col items-start gap-2">
+          <button
+            className="flex items-center gap-3 px-6 py-3 bg-primary border-white border text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 cursor-pointer"
+            onClick={handleLogin}
+            disabled={loading}
+            aria-label="Sign in with Github"
+          >
+            {loading ? (
+              <span className="animate-pulse text-sm">Loading...</span>
+            ) : (
+              <>
+                <FaGithub className="size-5" />
+                Continue with GitHub
+              </>
+            )}
+          </button>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+        </div>
       ) : (
         <div>
           <button
