@@ -4,6 +4,8 @@ import { signIn, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon } from "lucide-react";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -36,26 +38,38 @@ export default function Login() {
   };
 
   return (
-    <div>
-      {status === "loading" && <div>Loading...</div>}
-      <div className="flex flex-col items-start gap-2">
-        <button
-          className="flex items-center gap-3 px-6 py-3 bg-primary border-white border text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 cursor-pointer"
-          onClick={handleLogin}
-          disabled={loading}
-          aria-label="Sign in with Github"
-        >
-          {loading ? (
-            <span className="animate-pulse text-sm">Loading...</span>
-          ) : (
-            <>
-              <FaGithub className="size-5" />
-              Continue with GitHub
-            </>
-          )}
-        </button>
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex flex-col flex-grow items-center justify-center px-4">
+        {status === "loading" ? (
+          <p className="text-lg text-center">Loading...</p>
+        ) : (
+          <div className="flex flex-col items-center gap-6 max-w-xs w-full">
+            <Button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 cursor-pointer"
+              aria-label="Sign in with GitHub"
+              size="lg"
+            >
+              {loading ? (
+                <>
+                  <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
+                  Logging you in...
+                </>
+              ) : (
+                <>
+                  <FaGithub className="w-5 h-5" />
+                  Continue with GitHub
+                </>
+              )}
+            </Button>
+
+            {error && (
+              <p className="text-red-600 text-sm text-center">{error}</p>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

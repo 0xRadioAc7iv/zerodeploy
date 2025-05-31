@@ -1,41 +1,24 @@
-"use client";
-
 import Header from "@/components/Header";
+import LandingTyping from "@/components/LandingTyping";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useTypewriter, Cursor } from "react-simple-typewriter";
 
-export default function Home() {
-  const { status } = useSession();
+export default async function Home() {
+  const session = await getServerSession(authOptions);
 
-  if (status === "authenticated") {
+  if (session) {
     redirect("/new");
   }
-
-  const [text] = useTypewriter({
-    words: [
-      "Zero to Deploy in One Click.",
-      "Zero Waiting. Infinite Deploys.",
-      "Deploy from Zero to Hero.",
-      "Because Every Deploy Starts at Zero.",
-      "Zero Hassle, Maximum Deploy.",
-    ],
-    loop: true,
-    delaySpeed: 2500,
-    deleteSpeed: 50,
-  });
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex flex-col flex-grow gap-12 items-center justify-center px-4">
-        <div className="text-5xl font-semibold text-center">
-          {text}
-          <Cursor cursorStyle="|" />
-        </div>
+        <LandingTyping />
         <div>
           <Button variant="outline" size="lg" className="rounded-full" asChild>
             <Link href="/login" className="">
