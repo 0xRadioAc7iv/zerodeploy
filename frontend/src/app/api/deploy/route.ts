@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  sqs.send(
+  await sqs.send(
     new SendMessageCommand({
       QueueUrl: process.env.AWS_SQS_QUEUE_URL,
       MessageGroupId: session.user.id,
