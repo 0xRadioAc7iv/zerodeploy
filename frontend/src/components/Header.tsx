@@ -15,7 +15,9 @@ export default function Header() {
               height={25}
               className="align-middle"
             />
-            <span className="text-2xl font-semibold leading-none">Deploy</span>
+            <span className="text-2xl font-semibold leading-none">
+              ZeroDeploy
+            </span>
           </Link>
 
           {/* <nav className="hidden md:flex items-center space-x-6 text-base text-gray-700">
