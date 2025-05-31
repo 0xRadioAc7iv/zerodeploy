@@ -1,67 +1,56 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useState } from "react";
-import { FaGithub } from "react-icons/fa";
+import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useTypewriter, Cursor } from "react-simple-typewriter";
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const { status } = useSession();
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError("");
+  if (status === "authenticated") {
+    redirect("/new");
+  }
 
-    try {
-      const res = await signIn("github", {
-        callbackUrl: "/new",
-        redirect: false,
-      });
-
-      if (res?.error) {
-        setError("Login failed. Please try again.");
-        setLoading(false);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again later.");
-      setLoading(false);
-    }
-  };
+  const [text] = useTypewriter({
+    words: [
+      "Zero to Deploy in One Click.",
+      "Zero Waiting. Infinite Deploys.",
+      "Deploy from Zero to Hero.",
+      "Because Every Deploy Starts at Zero.",
+      "Zero Hassle, Maximum Deploy.",
+    ],
+    loop: true,
+    delaySpeed: 2500,
+    deleteSpeed: 50,
+  });
 
   return (
-    <div>
-      {status === "loading" && <div>Loading...</div>}
-      {status === "unauthenticated" ? (
-        <div className="flex flex-col items-start gap-2">
-          <button
-            className="flex items-center gap-3 px-6 py-3 bg-primary border-white border text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 cursor-pointer"
-            onClick={handleLogin}
-            disabled={loading}
-            aria-label="Sign in with Github"
-          >
-            {loading ? (
-              <span className="animate-pulse text-sm">Loading...</span>
-            ) : (
-              <>
-                <FaGithub className="size-5" />
-                Continue with GitHub
-              </>
-            )}
-          </button>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex flex-col flex-grow gap-12 items-center justify-center px-4">
+        <div className="text-5xl font-semibold text-center">
+          {text}
+          <Cursor cursorStyle="|" />
         </div>
-      ) : (
         <div>
-          <button
-            onClick={() => signOut()}
-            className="border rounded-md px-2 py-2 font-semibold cursor-pointer"
-          >
-            Log Out
-          </button>
+          <Button variant="outline" size="lg" className="rounded-full" asChild>
+            <Link href="/login" className="">
+              <Image
+                src="/logos/main_logo_black.svg"
+                alt="Deploy"
+                width={20}
+                height={20}
+                className=""
+              />
+              <span className="text-lg font-semibold">Start Deploying</span>
+            </Link>
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
