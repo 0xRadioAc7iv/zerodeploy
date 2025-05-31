@@ -62,8 +62,13 @@ async function pollSQSForMessages() {
         console.log(`📦 Installing dependencies: ${installCommand}`);
         await runCommand(installCommand, extractedDir);
 
-        console.log(`🏗️ Building project: ${buildCommand}`);
-        await runCommand(buildCommand, extractedDir);
+        console.log(
+          `🏗️ Building project: ${buildCommand} -- --base=/builds/${repo}/`
+        );
+        await runCommand(
+          buildCommand + ` -- --base=/builds/${repo}/`,
+          extractedDir
+        );
 
         console.log("✅ Build completed successfully");
 
