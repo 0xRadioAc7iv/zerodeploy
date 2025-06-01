@@ -100,6 +100,7 @@ export default function ImportNewRepositoryPage() {
         setInstallCommand(data.installCommand);
         setBuildCommand(data.buildCommand);
         setOutputDirectory(data.outputDirectory);
+        /* eslint-disable @typescript-eslint/no-explicit-any */
       } catch (err: any) {
         setError(err.message || "Unexpected error");
       } finally {
@@ -211,17 +212,20 @@ export default function ImportNewRepositoryPage() {
 
                 {deploymentState &&
                   deploymentState.startsWith("Deployed:::") && (
-                    <p className="text-sm mt-2 text-blue-600">
-                      <Button asChild>
-                        <Link
-                          href={deploymentState.split(":::")[1]}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Visit Deployment
-                        </Link>
-                      </Button>
-                    </p>
+                    <div>
+                      <p>Deployment ID: {buildId}</p>
+                      <p className="text-sm mt-2 text-blue-600">
+                        <Button asChild>
+                          <Link
+                            href={deploymentState.split(":::")[1]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Visit Deployment
+                          </Link>
+                        </Button>
+                      </p>
+                    </div>
                   )}
               </div>
             ) : null}
