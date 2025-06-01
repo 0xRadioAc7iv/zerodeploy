@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+// import { TextMuted } from "@/components/ui/text-muted"; // Optional component
+import { Skeleton } from "@/components/ui/skeleton"; // Optional for loading
+import { Lock } from "lucide-react";
 
 type Repo = {
   id: number;
@@ -82,48 +88,63 @@ export default function NewProjectPage() {
   }, [search]);
 
   return (
-    <div className="p-6">
-      <div className="text-2xl font-semibold mb-4">Deploy a New Project</div>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-2xl flex flex-col items-center justify-center space-y-6">
+        <h1 className="text-center text-3xl font-bold">Deploy a New Project</h1>
 
-      <input
-        type="text"
-        placeholder="Search from GitHub..."
-        className="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+        <Input
+          type="text"
+          placeholder="Search from your GitHub..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full"
+        />
 
-      {loading ? (
-        <div className="text-gray-500">Loading repositories...</div>
-      ) : repos.length === 0 ? (
-        <div className="text-gray-500">No repositories found.</div>
-      ) : (
-        <ul className="space-y-4">
-          {repos.map((repo) => (
-            <li
-              key={repo.id}
-              className="p-4 border rounded-xl hover:shadow-md transition"
-            >
-              <div className="text-xl font-bold">{repo.name}</div>
-              {repo.private && (
-                <span className="ml-2 inline-block text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
-                  Private
-                </span>
-              )}
-              <p className="text-xs text-gray-400 mt-1">
-                Last updated: {timeAgo(repo.updated_at)}
-              </p>
-              <Link
-                href={`/new/import?repo_url=${encodeURIComponent(
-                  repo.html_url
-                )}`}
-              >
-                <button className="border-2 px-2 cursor-pointer">Import</button>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+        <div className="w-full flex-grow flex flex-col justify-center">
+          {loading ? (
+            <div className="space-y-4 mt-6">
+              {[...Array(5)].map((_, idx) => (
+                <Skeleton key={idx} className="h-20 w-full rounded-xl" />
+              ))}
+            </div>
+          ) : repos.length === 0 ? (
+            <p className="text-center text-muted-foreground mt-6">
+              No repositories found.
+            </p>
+          ) : (
+            <div className="space-y-4 overflow-auto">
+              {repos.map((repo) => (
+                <Card key={repo.id} className="hover:shadow-md transition">
+                  <CardContent className="">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                      <div>
+                        <div className="text-base font-medium flex items-center gap-2">
+                          {repo.name}
+                          {repo.private && (
+                            <Lock className="w-4 h-4 text-gray-500" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Last updated: {timeAgo(repo.updated_at)}
+                        </p>
+                      </div>
+                      <Link
+                        href={`/new/import?repo_url=${encodeURIComponent(
+                          repo.html_url
+                        )}`}
+                      >
+                        <Button variant="outline" className="mt-2 sm:mt-0">
+                          Import
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
