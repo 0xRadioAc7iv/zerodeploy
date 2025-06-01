@@ -5,10 +5,12 @@ import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { redis } from "@/lib/redis";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   const body = await request.json();
+  const buildId = randomUUID();
 
   if (!session || !session.accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,9 +30,11 @@ export async function POST(request: NextRequest) {
       QueueUrl: process.env.AWS_SQS_QUEUE_URL,
       MessageGroupId: session.user.id,
       MessageDeduplicationId: randomUUID(),
-      MessageBody: JSON.stringify(data),
+      MessageBody: JSON.stringify({ ...data, buildId }),
     })
   );
 
-  return NextResponse.json({});
+  await redis.set(`buildStatus:${buildId}`, "Queued");
+
+  return NextResponse.json({ buildId });
 }

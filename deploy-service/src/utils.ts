@@ -5,11 +5,11 @@ import path from "path";
 import { readdir, readFile } from "fs/promises";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { createReadStream, createWriteStream } from "fs";
 import unzipper from "unzipper";
+import { redis } from "./redis.ts";
 
-const execAsync = promisify(exec);
 const pipelineAsync = promisify(pipeline);
 
 function getContentType(filename: string) {
@@ -51,8 +51,6 @@ async function uploadDirectoryToS3(localDir: string, s3Prefix: string) {
           ContentType: getContentType(entry.name),
         })
       );
-
-      console.log(`Uploaded: ${s3Key}`);
     }
   }
 }
@@ -62,12 +60,7 @@ export async function uploadBuiltFolderToS3(
   repo: string
 ) {
   const s3Prefix = `builds/${repo}/`; // TODO: ADD USERNAME BEFORE REPO NAME
-
-  console.log(
-    `Uploading ${outputDestination} → s3://${AWS_S3_BUCKET_NAME}/${s3Prefix}`
-  );
   await uploadDirectoryToS3(outputDestination, s3Prefix);
-  console.log(`✅ Upload complete for repo ${outputDestination}`);
 }
 
 export function parseGitHubUrl(url: string) {
@@ -93,9 +86,39 @@ export async function unzip(zipPath: string, destPath: string) {
   );
 }
 
-export async function runCommand(command: string, cwd: string) {
-  console.log(`> ${command}`);
-  const { stdout, stderr } = await execAsync(command, { cwd });
-  if (stdout) console.log(stdout);
-  if (stderr) console.error(stderr);
+export function publishLog(buildId: string, message: string) {
+  redis.xAdd(`logs:${buildId}`, "*", { message });
+}
+
+export async function setBuildStatus(buildId: string, status: string) {
+  await redis.set(`buildStatus:${buildId}`, status);
+}
+
+export async function runCommand(
+  command: string,
+  cwd: string,
+  buildId: string
+): Promise<void> {
+  publishLog(buildId, `Running command: ${command}`);
+
+  return new Promise((resolve, reject) => {
+    const proc = spawn(command, { cwd, shell: true });
+
+    proc.stdout.on("data", (data) => {
+      publishLog(buildId, data.toString());
+    });
+
+    proc.stderr.on("data", (data) => {
+      publishLog(buildId, `[stderr] ${data.toString()}`);
+    });
+
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        publishLog(buildId, `❌ Command failed with code ${code}`);
+        reject(new Error(`Command failed with exit code ${code}`));
+      }
+    });
+  });
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,12 +17,17 @@ export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
   const repoUrl = searchParams.get("repo_url");
 
+  if (!repoUrl) {
+    redirect("/new");
+  }
+
+  const [buildId, setBuildId] = useState<string>();
+  const [deploymentState, setDeploymentState] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [framework, setFramework] = useState<string | null>(null);
   const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
-
   const [installCommand, setInstallCommand] = useState("");
   const [buildCommand, setBuildCommand] = useState("");
   const [outputDirectory, setOutputDirectory] = useState("");
@@ -31,7 +36,11 @@ export default function ImportNewRepositoryPage() {
   const [enableBuild, setEnableBuild] = useState(false);
   const [enableOutput, setEnableOutput] = useState(false);
 
+  const [isDeploying, setIsDeploying] = useState(false);
+
   async function handleDeployRepo() {
+    setIsDeploying(true);
+    setDeploymentState(undefined);
     const response = await fetch("/api/deploy", {
       method: "POST",
       body: JSON.stringify({
@@ -46,7 +55,30 @@ export default function ImportNewRepositoryPage() {
 
     if (!response.ok) {
       console.error("Failed to deploy");
+      setIsDeploying(false);
+      return;
     }
+
+    const data = await response.json();
+    const id = data.buildId;
+    setBuildId(id);
+
+    pollStatus(id);
+  }
+
+  async function pollStatus(buildId: string) {
+    const interval = setInterval(async () => {
+      const res = await fetch(`/api/status?buildId=${buildId}`);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      setDeploymentState(data.status);
+
+      if (data.status.startsWith("Deployed:::")) {
+        setIsDeploying(false);
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 
   useEffect(() => {
@@ -68,7 +100,6 @@ export default function ImportNewRepositoryPage() {
         setInstallCommand(data.installCommand);
         setBuildCommand(data.buildCommand);
         setOutputDirectory(data.outputDirectory);
-        /* eslint-disable @typescript-eslint/no-explicit-any */
       } catch (err: any) {
         setError(err.message || "Unexpected error");
       } finally {
@@ -90,7 +121,7 @@ export default function ImportNewRepositoryPage() {
                 <p className="text-sm text-muted-foreground mb-2">
                   Importing from GitHub:
                 </p>
-                <p className="flex text-sm font-medium break-words">
+                <div className="flex text-sm font-medium break-words">
                   <Link href={repoUrl} target="_blank" className="flex gap-1.5">
                     <FaGithub size="20" />
                     <div className="font-semibold">
@@ -102,7 +133,7 @@ export default function ImportNewRepositoryPage() {
                       branch: {defaultBranch}
                     </Badge>
                   )}
-                </p>
+                </div>
               </div>
             )}
 
@@ -173,10 +204,25 @@ export default function ImportNewRepositoryPage() {
                 <Button
                   onClick={handleDeployRepo}
                   className="w-full mt-2 cursor-pointer"
-                  disabled={loading}
+                  disabled={loading || isDeploying}
                 >
-                  Deploy
+                  {isDeploying ? "Deploying..." : "Deploy"}
                 </Button>
+
+                {deploymentState &&
+                  deploymentState.startsWith("Deployed:::") && (
+                    <p className="text-sm mt-2 text-blue-600">
+                      <Button asChild>
+                        <Link
+                          href={deploymentState.split(":::")[1]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Visit Deployment
+                        </Link>
+                      </Button>
+                    </p>
+                  )}
               </div>
             ) : null}
           </CardContent>

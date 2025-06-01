@@ -1,5 +1,5 @@
 {
-  "name": "upload-service",
+  "name": "deploy-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,6 +20,7 @@
     "dotenv": "^16.5.0",
     "env-var": "^7.5.0",
     "fastify": "^5.3.3",
+    "redis": "^5.1.1",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {

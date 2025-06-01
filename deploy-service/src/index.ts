@@ -8,7 +8,9 @@ import { AWS_SQS_QUEUE_URL } from "./env.ts";
 import {
   downloadFile,
   parseGitHubUrl,
+  publishLog,
   runCommand,
+  setBuildStatus,
   unzip,
   uploadBuiltFolderToS3,
 } from "./utils.ts";
@@ -16,6 +18,7 @@ import { mkdir, rm } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 import { tmpdir } from "os";
+import { redis } from "./redis.ts";
 
 const app = Fastify();
 
@@ -41,36 +44,36 @@ async function pollSQSForMessages() {
         installCommand,
         buildCommand,
         outputDirectory,
+        buildId,
       } = JSON.parse(message.Body as string);
 
       const tmpPath = join(tmpdir(), `repo-${Date.now()}`);
       if (!existsSync(tmpPath)) await mkdir(tmpPath);
+
+      await setBuildStatus(buildId, "Deploying...");
 
       try {
         const { owner, repo } = parseGitHubUrl(repoUrl);
         const zipUrl = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
         const zipPath = join(tmpPath, `${owner}-${repo}-${defaultBranch}.zip`);
 
-        console.log(`📥 Downloading ZIP from: ${zipUrl}`);
+        publishLog(buildId, `Downloading ZIP...`);
         await downloadFile(zipUrl, zipPath);
 
-        console.log(`📂 Unzipping to: ${tmpPath}`);
+        publishLog(buildId, `Unzipping files...`);
         await unzip(zipPath, tmpPath);
 
         const extractedDir = join(tmpPath, `${repo}-${defaultBranch}`);
 
-        console.log(`📦 Installing dependencies: ${installCommand}`);
-        await runCommand(installCommand, extractedDir);
+        publishLog(buildId, `Installing dependencies...`);
+        await runCommand(installCommand, extractedDir, buildId);
 
-        console.log(
-          `🏗️ Building project: ${buildCommand} -- --base=/builds/${repo}/`
-        );
+        publishLog(buildId, `Building project...`);
         await runCommand(
           buildCommand + ` -- --base=/builds/${repo}/`,
-          extractedDir
+          extractedDir,
+          buildId
         );
-
-        console.log("✅ Build completed successfully");
 
         await uploadBuiltFolderToS3(join(extractedDir, outputDirectory), repo);
 
@@ -84,6 +87,13 @@ async function pollSQSForMessages() {
             QueueUrl: AWS_SQS_QUEUE_URL,
             ReceiptHandle: message.ReceiptHandle!,
           })
+        );
+
+        publishLog(buildId, "Exiting build process...");
+
+        await setBuildStatus(
+          buildId,
+          `Deployed:::https://${repo}.zerodeploy.xyz`
         );
       } catch (err) {
         console.error("❌ Build failed:", err);
@@ -100,4 +110,9 @@ app.get("/check", (_, reply) => {
   reply.code(200).send();
 });
 
-app.listen({ port: 4000, host: "0.0.0.0" }, () => pollSQSForMessages());
+app.listen({ port: 4000, host: "0.0.0.0" }, async () => {
+  await redis.connect();
+  console.log("Connected to Redis");
+  pollSQSForMessages();
+  console.log("polling for messages now...");
+});
