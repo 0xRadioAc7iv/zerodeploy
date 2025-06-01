@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { FaGithub } from "react-icons/fa";
 
 export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
@@ -86,16 +87,15 @@ export default function ImportNewRepositoryPage() {
           <CardContent className="space-y-4">
             {repoUrl && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-2">
                   Importing from GitHub:
                 </p>
-                <p className="text-sm font-medium break-words">
-                  <Link
-                    href={repoUrl}
-                    target="_blank"
-                    className="underline underline-offset-4 text-blue-600"
-                  >
-                    {repoUrl}
+                <p className="flex text-sm font-medium break-words">
+                  <Link href={repoUrl} target="_blank" className="flex gap-1.5">
+                    <FaGithub size="20" />
+                    <div className="font-semibold">
+                      {repoUrl.split("/").splice(3).join("/")}
+                    </div>
                   </Link>
                   {defaultBranch && (
                     <Badge variant="outline" className="ml-2 text-xs">
@@ -119,14 +119,13 @@ export default function ImportNewRepositoryPage() {
             ) : framework ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Framework:{" "}
+                  Framework Preset:{" "}
                   <span className="font-semibold text-foreground">
                     {framework}
                   </span>
                 </p>
 
-                {/* Install Command */}
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <Label>Install Command</Label>
                   <div className="flex items-center gap-2">
                     <Input
@@ -141,8 +140,7 @@ export default function ImportNewRepositoryPage() {
                   </div>
                 </div>
 
-                {/* Build Command */}
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <Label>Build Command</Label>
                   <div className="flex items-center gap-2">
                     <Input
@@ -157,8 +155,7 @@ export default function ImportNewRepositoryPage() {
                   </div>
                 </div>
 
-                {/* Output Directory */}
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <Label>Output Directory</Label>
                   <div className="flex items-center gap-2">
                     <Input
@@ -175,7 +172,7 @@ export default function ImportNewRepositoryPage() {
 
                 <Button
                   onClick={handleDeployRepo}
-                  className="w-full mt-2"
+                  className="w-full mt-2 cursor-pointer"
                   disabled={loading}
                 >
                   Deploy

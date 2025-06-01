@@ -43,30 +43,33 @@ export default function Login() {
         {status === "loading" ? (
           <p className="text-lg text-center">Loading...</p>
         ) : (
-          <div className="flex flex-col items-center gap-6 max-w-xs w-full">
-            <Button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 cursor-pointer"
-              aria-label="Sign in with GitHub"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
-                  Logging you in...
-                </>
-              ) : (
-                <>
-                  <FaGithub className="w-5 h-5" />
-                  Continue with GitHub
-                </>
-              )}
-            </Button>
+          <div className="flex flex-col items-center gap-10">
+            <div className="text-4xl font-semibold">Log in to ZeroDeploy</div>
+            <div className="flex flex-col items-center gap-6 max-w-xs w-full">
+              <Button
+                onClick={handleLogin}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 cursor-pointer"
+                aria-label="Sign in with GitHub"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
+                    Logging you in...
+                  </>
+                ) : (
+                  <>
+                    <FaGithub className="w-5 h-5" />
+                    Continue with GitHub
+                  </>
+                )}
+              </Button>
 
-            {error && (
-              <p className="text-red-600 text-sm text-center">{error}</p>
-            )}
+              {error && (
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              )}
+            </div>
           </div>
         )}
       </main>

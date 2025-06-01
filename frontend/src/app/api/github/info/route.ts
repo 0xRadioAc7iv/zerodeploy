@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     /vite\.config\.(js|ts|mjs|cjs)$/.test(path)
   );
 
-  const framework = isVite ? "Vite" : "Unknown";
+  const framework = isVite ? "Vite" : "Other";
 
   const hasPnpm = paths.includes("pnpm-lock.yaml");
   const hasYarn = paths.includes("yarn.lock");

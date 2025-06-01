@@ -24,25 +24,19 @@ function timeAgo(dateString: string) {
   const days = Math.floor(diff / 86400);
 
   if (days > 7) {
-    return date.toLocaleDateString("en-GB", {
+    return date.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
     });
   }
 
-  if (diff < 60) return `${diff} second${diff !== 1 ? "s" : ""} ago`;
+  if (diff < 60) return `${diff}s ago`;
 
-  if (diff < 3600)
-    return `${Math.floor(diff / 60)} minute${
-      Math.floor(diff / 60) !== 1 ? "s" : ""
-    } ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}min ago`;
 
-  if (diff < 86400)
-    return `${Math.floor(diff / 3600)} hour${
-      Math.floor(diff / 3600) !== 1 ? "s" : ""
-    } ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
 
-  return `${days} day${days !== 1 ? "s" : ""} ago`;
+  return `${days}d ago`;
 }
 
 export default function NewProjectPage() {
@@ -123,17 +117,21 @@ export default function NewProjectPage() {
                           {repo.private && (
                             <Lock className="w-4 h-4 text-gray-500" />
                           )}
+                          <span className="text-muted-foreground">·</span>
+                          <p className="text-muted-foreground">
+                            {timeAgo(repo.updated_at)}
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Last updated: {timeAgo(repo.updated_at)}
-                        </p>
                       </div>
                       <Link
                         href={`/new/import?repo_url=${encodeURIComponent(
                           repo.html_url
                         )}`}
                       >
-                        <Button variant="outline" className="mt-2 sm:mt-0">
+                        <Button
+                          variant="outline"
+                          className="mt-2 sm:mt-0 cursor-pointer"
+                        >
                           Import
                         </Button>
                       </Link>

@@ -7,7 +7,7 @@ export default function Header() {
     <header className="w-full border-b shadow-sm">
       <div className="flex items-center justify-between py-4 px-12">
         <div className="flex items-center space-x-14">
-          <Link href="/" className="flex items-stretch gap-1">
+          <Link href="/" className="flex items-stretch gap-2">
             <Image
               src="/logos/main_logo_black.svg"
               alt="Not Vercel"
