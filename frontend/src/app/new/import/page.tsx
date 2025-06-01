@@ -3,6 +3,14 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
@@ -13,9 +21,14 @@ export default function ImportNewRepositoryPage() {
 
   const [framework, setFramework] = useState<string | null>(null);
   const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
+
   const [installCommand, setInstallCommand] = useState("");
   const [buildCommand, setBuildCommand] = useState("");
   const [outputDirectory, setOutputDirectory] = useState("");
+
+  const [enableInstall, setEnableInstall] = useState(false);
+  const [enableBuild, setEnableBuild] = useState(false);
+  const [enableOutput, setEnableOutput] = useState(false);
 
   async function handleDeployRepo() {
     const response = await fetch("/api/deploy", {
@@ -66,74 +79,112 @@ export default function ImportNewRepositoryPage() {
   }, [repoUrl]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Import Repository</h1>
-
-      {repoUrl && (
-        <div>
-          <p>Importing from Github</p>
-          <p className="text-gray-600 mb-2">
-            <Link href={repoUrl} target="_blank">
-              Repo: {repoUrl}
-            </Link>
-            {defaultBranch && (
-              <Link href={repoUrl} target="_blank">
-                <span className="ml-2 text-sm text-gray-500">
-                  (branch: {defaultBranch})
-                </span>
-              </Link>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-xl space-y-6">
+        <h1 className="text-center text-3xl font-bold">Import Repository</h1>
+        <Card>
+          <CardContent className="space-y-4">
+            {repoUrl && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Importing from GitHub:
+                </p>
+                <p className="text-sm font-medium break-words">
+                  <Link
+                    href={repoUrl}
+                    target="_blank"
+                    className="underline underline-offset-4 text-blue-600"
+                  >
+                    {repoUrl}
+                  </Link>
+                  {defaultBranch && (
+                    <Badge variant="outline" className="ml-2 text-xs">
+                      branch: {defaultBranch}
+                    </Badge>
+                  )}
+                </p>
+              </div>
             )}
-          </p>
-        </div>
-      )}
 
-      {loading && <p className="text-gray-500">Analyzing repository...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, idx) => (
+                  <Skeleton key={idx} className="h-10 w-full rounded-md" />
+                ))}
+              </div>
+            ) : error ? (
+              <Alert variant="destructive">
+                <AlertDescription>Error: {error}</AlertDescription>
+              </Alert>
+            ) : framework ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Framework:{" "}
+                  <span className="font-semibold text-foreground">
+                    {framework}
+                  </span>
+                </p>
 
-      {!loading && framework && (
-        <div className="mt-4 space-y-4">
-          <p className="text-lg">
-            Detected Framework:{" "}
-            <span className="font-semibold">{framework}</span>
-          </p>
+                {/* Install Command */}
+                <div className="space-y-1">
+                  <Label>Install Command</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={installCommand}
+                      onChange={(e) => setInstallCommand(e.target.value)}
+                      disabled={!enableInstall}
+                    />
+                    <Switch
+                      checked={enableInstall}
+                      onCheckedChange={setEnableInstall}
+                    />
+                  </div>
+                </div>
 
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium">Install Command</label>
-            <input
-              type="text"
-              className="border p-2 rounded-md"
-              value={installCommand}
-              onChange={(e) => setInstallCommand(e.target.value)}
-            />
-          </div>
+                {/* Build Command */}
+                <div className="space-y-1">
+                  <Label>Build Command</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={buildCommand}
+                      onChange={(e) => setBuildCommand(e.target.value)}
+                      disabled={!enableBuild}
+                    />
+                    <Switch
+                      checked={enableBuild}
+                      onCheckedChange={setEnableBuild}
+                    />
+                  </div>
+                </div>
 
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium">Build Command</label>
-            <input
-              type="text"
-              className="border p-2 rounded-md"
-              value={buildCommand}
-              onChange={(e) => setBuildCommand(e.target.value)}
-            />
-          </div>
+                {/* Output Directory */}
+                <div className="space-y-1">
+                  <Label>Output Directory</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={outputDirectory}
+                      onChange={(e) => setOutputDirectory(e.target.value)}
+                      disabled={!enableOutput}
+                    />
+                    <Switch
+                      checked={enableOutput}
+                      onCheckedChange={setEnableOutput}
+                    />
+                  </div>
+                </div>
 
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium">Output Directory</label>
-            <input
-              type="text"
-              className="border p-2 rounded-md"
-              value={outputDirectory}
-              onChange={(e) => setOutputDirectory(e.target.value)}
-            />
-          </div>
-          <button
-            className="border-2 px-2 py-1 rounded-md cursor-pointer"
-            onClick={handleDeployRepo}
-          >
-            Deploy
-          </button>
-        </div>
-      )}
+                <Button
+                  onClick={handleDeployRepo}
+                  className="w-full mt-2"
+                  disabled={loading}
+                >
+                  Deploy
+                </Button>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
