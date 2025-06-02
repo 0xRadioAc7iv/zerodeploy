@@ -40,7 +40,7 @@ async function pollSQSForMessages() {
 
       const {
         repoUrl,
-        defaultBranch = "main",
+        defaultBranch,
         installCommand,
         buildCommand,
         outputDirectory,
@@ -110,9 +110,17 @@ app.get("/check", (_, reply) => {
   reply.code(200).send();
 });
 
-app.listen({ port: 4000, host: "0.0.0.0" }, async () => {
-  await redis.connect();
-  console.log("Connected to Redis");
-  pollSQSForMessages();
-  console.log("polling for messages now...");
-});
+const start = async () => {
+  try {
+    await app.listen({ port: 4000, host: "0.0.0.0" });
+    await redis.connect();
+    console.log("Connected to Redis");
+    pollSQSForMessages();
+    console.log("Polling for messages now...");
+  } catch (err) {
+    console.error("Server failed to start:", err);
+    process.exit(1);
+  }
+};
+
+start();

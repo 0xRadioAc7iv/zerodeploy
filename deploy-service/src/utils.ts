@@ -9,6 +9,7 @@ import { spawn } from "child_process";
 import { createReadStream, createWriteStream } from "fs";
 import unzipper from "unzipper";
 import { redis } from "./redis.ts";
+import stripAnsi from "strip-ansi";
 
 const pipelineAsync = promisify(pipeline);
 
@@ -87,7 +88,8 @@ export async function unzip(zipPath: string, destPath: string) {
 }
 
 export function publishLog(buildId: string, message: string) {
-  redis.xAdd(`logs:${buildId}`, "*", { message });
+  const cleanMessage = stripAnsi(message);
+  redis.xAdd(`logs:${buildId}`, "*", { message: cleanMessage });
 }
 
 export async function setBuildStatus(buildId: string, status: string) {
@@ -99,8 +101,6 @@ export async function runCommand(
   cwd: string,
   buildId: string
 ): Promise<void> {
-  publishLog(buildId, `Running command: ${command}`);
-
   return new Promise((resolve, reject) => {
     const proc = spawn(command, { cwd, shell: true });
 
