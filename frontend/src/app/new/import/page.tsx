@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { FaGithub } from "react-icons/fa";
+import { Loader2Icon } from "lucide-react";
 
 export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
@@ -37,6 +38,7 @@ export default function ImportNewRepositoryPage() {
   const [enableOutput, setEnableOutput] = useState(false);
 
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isDeployed, setIsDeployed] = useState(false);
 
   async function handleDeployRepo() {
     setIsDeploying(true);
@@ -76,6 +78,7 @@ export default function ImportNewRepositoryPage() {
 
       if (data.status.startsWith("Deployed:::")) {
         setIsDeploying(false);
+        setIsDeployed(true);
         clearInterval(interval);
       }
     }, 1000);
@@ -205,27 +208,35 @@ export default function ImportNewRepositoryPage() {
                 <Button
                   onClick={handleDeployRepo}
                   className="w-full mt-2 cursor-pointer"
-                  disabled={loading || isDeploying}
+                  disabled={loading || isDeploying || isDeployed}
                 >
-                  {isDeploying ? "Deploying..." : "Deploy"}
+                  {isDeploying ? (
+                    <div className="flex items-center">
+                      <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
+                      <div>Deploying...</div>
+                    </div>
+                  ) : isDeployed ? (
+                    "Deployed"
+                  ) : (
+                    "Deploy"
+                  )}
                 </Button>
+
+                {deploymentState && <p>Deployment ID: {buildId}</p>}
 
                 {deploymentState &&
                   deploymentState.startsWith("Deployed:::") && (
-                    <div>
-                      <p>Deployment ID: {buildId}</p>
-                      <p className="text-sm mt-2 text-blue-600">
-                        <Button asChild>
-                          <Link
-                            href={deploymentState.split(":::")[1]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Visit Deployment
-                          </Link>
-                        </Button>
-                      </p>
-                    </div>
+                    <p className="text-sm mt-2 text-blue-600">
+                      <Button asChild>
+                        <Link
+                          href={deploymentState.split(":::")[1]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Visit Deployment
+                        </Link>
+                      </Button>
+                    </p>
                   )}
               </div>
             ) : null}
