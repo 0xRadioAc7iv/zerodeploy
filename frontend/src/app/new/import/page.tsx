@@ -110,6 +110,7 @@ export default function ImportNewRepositoryPage() {
         setInstallCommand(data.installCommand);
         setBuildCommand(data.buildCommand);
         setOutputDirectory(data.outputDirectory);
+        /* eslint-disable @typescript-eslint/no-explicit-any */
       } catch (err: any) {
         setError(err.message || "Unexpected error");
       } finally {
