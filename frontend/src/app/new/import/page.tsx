@@ -250,7 +250,7 @@ export default function ImportNewRepositoryPage() {
 
                   <Button
                     onClick={handleDeployRepo}
-                    className="w-full mt-2"
+                    className="w-full mt-2 cursor-pointer"
                     disabled={loading || isDeploying || isDeployed}
                   >
                     {isDeploying ? (
@@ -273,7 +273,7 @@ export default function ImportNewRepositoryPage() {
                   )}
 
                   {deploymentState?.startsWith("Deployed:::") && (
-                    <Button asChild className="mt-2 cursor-pointer">
+                    <Button asChild className="mt-2">
                       <Link
                         href={deploymentState.split(":::")[1]}
                         target="_blank"
