@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { get } from "@vercel/edge-config";
 
 export default withAuth(
-  async function middleware(req) {
+  async function middleware() {
     const isDisabled = await get("disabled");
     if (isDisabled === true) {
       return new NextResponse(
