@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-// import { TextMuted } from "@/components/ui/text-muted"; // Optional component
-import { Skeleton } from "@/components/ui/skeleton"; // Optional for loading
+import { Skeleton } from "@/components/ui/skeleton";
 import { Lock } from "lucide-react";
 
 type Repo = {

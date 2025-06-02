@@ -273,7 +273,7 @@ export default function ImportNewRepositoryPage() {
                   )}
 
                   {deploymentState?.startsWith("Deployed:::") && (
-                    <Button asChild className="mt-2">
+                    <Button asChild className="mt-2 cursor-pointer">
                       <Link
                         href={deploymentState.split(":::")[1]}
                         target="_blank"

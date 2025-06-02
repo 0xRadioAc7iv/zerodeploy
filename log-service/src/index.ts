@@ -28,6 +28,8 @@ app.get("/logs/:buildId", async (req, res) => {
     Connection: "keep-alive",
   });
 
+  res.raw.flushHeaders();
+
   const sendLog = (msg: string) => {
     res.raw.write(`data: ${msg}\n\n`);
   };
