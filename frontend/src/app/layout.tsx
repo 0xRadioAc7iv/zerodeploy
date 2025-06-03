@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionProviderWrapper from "@/components/Providers";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import { get } from "@vercel/edge-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +21,21 @@ export const metadata: Metadata = {
   description: "Because Every Deploy Starts at Zero.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isDisabled = await get("disabled");
+
+  if (isDisabled) {
+    return (
+      <html lang="en">
+        <body>🚧 The app is temporarily down for maintenance.</body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en">
       <body
