@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
           installCommand: data.installCommand,
           buildCommand: data.buildCommand,
           outputDirectory: data.outputDirectory,
+          rootDirectory: data.rootDirectory,
           buildId,
         }),
       })

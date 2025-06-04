@@ -15,8 +15,39 @@ import { FaGithub } from "react-icons/fa";
 import { Loader2Icon } from "lucide-react";
 import clsx from "clsx";
 import { toast } from "sonner";
+import { RootDirectoryModal } from "@/components/RootDirectoryModal";
+import { FolderItem } from "@/lib/interfaces";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
+
+const frameworkPlaceholders = new Map<
+  string,
+  { installCommand: string; buildCommand: string; outputFolder: string }
+>([
+  [
+    "vite",
+    {
+      installCommand: "npm install",
+      buildCommand: "npm run build",
+      outputFolder: "dist",
+    },
+  ],
+  [
+    "other",
+    {
+      installCommand: "npm install",
+      buildCommand: "npm run build",
+      outputFolder: "public",
+    },
+  ],
+]);
 
 export default function ImportNewRepositoryPage() {
   const searchParams = useSearchParams();
@@ -31,11 +62,15 @@ export default function ImportNewRepositoryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [framework, setFramework] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [folderStructure, setFolderStructure] = useState<FolderItem[]>([]);
+  const [rootDirectory, setRootDirectory] = useState("./");
+
+  const [framework, setFramework] = useState<string>("other");
   const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
   const [installCommand, setInstallCommand] = useState("");
   const [buildCommand, setBuildCommand] = useState("");
-  const [outputDirectory, setOutputDirectory] = useState("");
+  const [outputDirectory, setOutputDirectory] = useState("dist");
 
   const [enableInstall, setEnableInstall] = useState(false);
   const [enableBuild, setEnableBuild] = useState(false);
@@ -61,6 +96,7 @@ export default function ImportNewRepositoryPage() {
         installCommand,
         buildCommand,
         outputDirectory,
+        rootDirectory,
       }),
     });
 
@@ -113,11 +149,8 @@ export default function ImportNewRepositoryPage() {
         if (!res.ok) throw new Error("Failed to analyze repository");
 
         const data = await res.json();
-        setFramework(data.framework);
         setDefaultBranch(data.defaultBranch);
-        setInstallCommand(data.installCommand);
-        setBuildCommand(data.buildCommand);
-        setOutputDirectory(data.outputDirectory);
+        setFolderStructure(data.folderStructure);
         /* eslint-disable @typescript-eslint/no-explicit-any */
       } catch (err: any) {
         setError(err.message || "Unexpected error");
@@ -139,7 +172,7 @@ export default function ImportNewRepositoryPage() {
         sse.close();
         return;
       }
-      setLogs((prev) => [...prev, e.data]);
+      if (e.data !== "ping") setLogs((prev) => [...prev, e.data]);
       logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
@@ -168,7 +201,7 @@ export default function ImportNewRepositoryPage() {
               {repoUrl && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Importing from GitHub:
+                    Importing from GitHub
                   </p>
                   <div className="flex text-sm font-medium break-words">
                     <Link
@@ -200,14 +233,41 @@ export default function ImportNewRepositoryPage() {
                 <Alert variant="destructive">
                   <AlertDescription>Error: {error}</AlertDescription>
                 </Alert>
-              ) : framework ? (
+              ) : (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Framework Preset:{" "}
-                    <span className="font-semibold text-foreground">
-                      {framework}
-                    </span>
-                  </p>
+                  <div className="text-sm text-muted-foreground">
+                    Framework Preset
+                    <div className="mt-2">
+                      <Select value={framework} onValueChange={setFramework}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Other" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="vite">Vite</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-muted-foreground">
+                    Root Directory
+                    <div className="flex gap-2 mt-2">
+                      <div className="w-full cursor-not-allowed">
+                        <Input
+                          value={rootDirectory}
+                          className="text-black tracking-wider font-semibold"
+                          disabled
+                        />
+                      </div>
+                      <Button
+                        className="hover:cursor-pointer"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
 
                   {[
                     [
@@ -216,6 +276,7 @@ export default function ImportNewRepositoryPage() {
                       setInstallCommand,
                       enableInstall,
                       setEnableInstall,
+                      frameworkPlaceholders.get(framework)?.installCommand,
                     ],
                     [
                       "Build",
@@ -223,6 +284,7 @@ export default function ImportNewRepositoryPage() {
                       setBuildCommand,
                       enableBuild,
                       setEnableBuild,
+                      frameworkPlaceholders.get(framework)?.buildCommand,
                     ],
                     [
                       "Output Directory",
@@ -230,29 +292,38 @@ export default function ImportNewRepositoryPage() {
                       setOutputDirectory,
                       enableOutput,
                       setEnableOutput,
+                      frameworkPlaceholders.get(framework)?.outputFolder,
                     ],
-                  ].map(([label, value, setter, enabled, toggle], idx) => (
-                    <div key={idx} className="space-y-2">
-                      <Label>{label as string}</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          value={value as string}
-                          onChange={(e) =>
-                            (
-                              setter as React.Dispatch<
-                                React.SetStateAction<string>
-                              >
-                            )(e.target.value)
-                          }
-                          disabled={!enabled}
-                        />
-                        <Switch
-                          checked={enabled as boolean}
-                          onCheckedChange={toggle as (checked: boolean) => void}
-                        />
+                  ].map(
+                    (
+                      [label, value, setter, enabled, toggle, placeholder],
+                      idx
+                    ) => (
+                      <div key={idx} className="space-y-2">
+                        <Label>{label as string}</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={value as string}
+                            onChange={(e) =>
+                              (
+                                setter as React.Dispatch<
+                                  React.SetStateAction<string>
+                                >
+                              )(e.target.value)
+                            }
+                            disabled={!enabled}
+                            placeholder={placeholder as string}
+                          />
+                          <Switch
+                            checked={enabled as boolean}
+                            onCheckedChange={
+                              toggle as (checked: boolean) => void
+                            }
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
 
                   <Button
                     onClick={handleDeployRepo}
@@ -290,7 +361,7 @@ export default function ImportNewRepositoryPage() {
                     </Button>
                   )}
                 </div>
-              ) : null}
+              )}
             </CardContent>
           </Card>
         </div>
@@ -310,6 +381,14 @@ export default function ImportNewRepositoryPage() {
             </div>
           </div>
         )}
+
+        <RootDirectoryModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onContinue={() => setIsModalOpen(false)}
+          folderStructure={folderStructure}
+          setRootDirectory={setRootDirectory}
+        />
       </div>
     </div>
   );

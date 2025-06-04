@@ -1,12 +1,12 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "./aws.ts";
 import { AWS_S3_BUCKET_NAME } from "./env.ts";
-import path from "path";
+import path, { dirname, join } from "path";
 import { readdir, readFile } from "fs/promises";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import { spawn } from "child_process";
-import { createReadStream, createWriteStream } from "fs";
+import { createWriteStream, existsSync, mkdirSync } from "fs";
 import unzipper from "unzipper";
 import { redis } from "./redis.ts";
 import stripAnsi from "strip-ansi";
@@ -83,9 +83,25 @@ export async function downloadFile(key: string, destPath: string) {
 }
 
 export async function unzip(zipPath: string, destPath: string) {
-  await pipelineAsync(
-    createReadStream(zipPath),
-    unzipper.Extract({ path: destPath })
+  const directory = await unzipper.Open.file(zipPath);
+
+  await Promise.all(
+    directory.files.map(async (file) => {
+      const filePath = join(destPath, file.path);
+
+      const dir = dirname(filePath);
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+
+      if (file.type === "Directory") return;
+
+      return new Promise<void>((resolve, reject) => {
+        file
+          .stream()
+          .pipe(createWriteStream(filePath))
+          .on("finish", resolve)
+          .on("error", reject);
+      });
+    })
   );
 }
 

@@ -46,6 +46,7 @@ async function pollSQSForMessages() {
         buildCommand,
         outputDirectory,
         buildId,
+        rootDirectory,
       } = JSON.parse(message.Body as string);
 
       const tmpPath = join(tmpdir(), `repo-${Date.now()}`);
@@ -63,18 +64,48 @@ async function pollSQSForMessages() {
         await unzip(zipPath, tmpPath);
 
         const extractedDir = join(tmpPath, `${repo}-${defaultBranch}`);
+        const rootDir =
+          rootDirectory !== "./"
+            ? join(extractedDir, rootDirectory)
+            : extractedDir;
+
+        let install = installCommand?.trim();
+        let build = buildCommand?.trim();
+
+        const useNpm = existsSync(join(rootDir, "package-lock.json"));
+        const useYarn = existsSync(join(rootDir, "yarn.lock"));
+        const usePnpm = existsSync(join(rootDir, "pnpm-lock.yaml"));
+
+        publishLog(
+          buildId,
+          `Detected package manager: ${
+            useNpm ? "npm" : useYarn ? "yarn" : usePnpm ? "pnpm" : "unknown"
+          }`
+        );
+
+        if (!install) {
+          if (useNpm) install = "npm install";
+          else if (useYarn) install = "yarn install";
+          else if (usePnpm) install = "pnpm install";
+        }
+
+        if (!build) {
+          if (useNpm) build = "npm run build";
+          else if (useYarn) build = "yarn build";
+          else if (usePnpm) build = "pnpm build";
+        }
 
         publishLog(buildId, `Installing dependencies...`);
-        await runCommand(installCommand, extractedDir, buildId);
+        await runCommand(install, rootDir, buildId);
 
         publishLog(buildId, `Building project...`);
         await runCommand(
-          buildCommand + ` -- --base=/builds/${repo}/`,
-          extractedDir,
+          build + ` -- --base=/builds/${repo}/`,
+          rootDir,
           buildId
         );
 
-        await uploadBuiltFolderToS3(join(extractedDir, outputDirectory), repo);
+        await uploadBuiltFolderToS3(join(rootDir, outputDirectory), repo);
 
         await rm(tmpPath, {
           recursive: true,

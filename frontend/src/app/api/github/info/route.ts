@@ -1,3 +1,4 @@
+import { generateFolderStructure } from "@/lib/utils";
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -56,26 +57,7 @@ export async function GET(req: NextRequest) {
   const data = await treeRes.json();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const paths: string[] = data.tree?.map((item: any) => item.path) ?? [];
+  const folderStructure = generateFolderStructure(paths, repo);
 
-  const isVite = paths.some((path) =>
-    /vite\.config\.(js|ts|mjs|cjs)$/.test(path)
-  );
-
-  const framework = isVite ? "Vite" : "Other";
-
-  const hasPnpm = paths.includes("pnpm-lock.yaml");
-  const hasYarn = paths.includes("yarn.lock");
-  const packageManager = hasPnpm ? "pnpm" : hasYarn ? "yarn" : "npm";
-
-  const buildCommand = `${packageManager} run build`;
-  const installCommand = `${packageManager} install`;
-  const outputDirectory = "dist";
-
-  return NextResponse.json({
-    framework,
-    defaultBranch,
-    buildCommand,
-    installCommand,
-    outputDirectory,
-  });
+  return NextResponse.json({ defaultBranch, folderStructure });
 }
