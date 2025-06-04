@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json({ buildId });
+    /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (error) {
     await redis.set(`buildStatus:${buildId}`, "Failed to Deploy");
     return NextResponse.json({ error: "Failed to deploy" }, { status: 500 });
