@@ -7,7 +7,6 @@ import {
 import { AWS_SQS_QUEUE_URL } from "./env.ts";
 import {
   downloadFile,
-  parseGitHubUrl,
   publishLog,
   runCommand,
   setBuildStatus,
@@ -39,7 +38,9 @@ async function pollSQSForMessages() {
       const message = messages[0];
 
       const {
-        repoUrl,
+        owner,
+        repo,
+        fileKey,
         defaultBranch,
         installCommand,
         buildCommand,
@@ -50,17 +51,15 @@ async function pollSQSForMessages() {
       const tmpPath = join(tmpdir(), `repo-${Date.now()}`);
       if (!existsSync(tmpPath)) await mkdir(tmpPath);
 
-      await setBuildStatus(buildId, "Deploying...");
+      const zipPath = join(tmpPath, `${owner}-${repo}-${defaultBranch}.zip`);
 
       try {
-        const { owner, repo } = parseGitHubUrl(repoUrl);
-        const zipUrl = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
-        const zipPath = join(tmpPath, `${owner}-${repo}-${defaultBranch}.zip`);
+        await setBuildStatus(buildId, "Deploying...");
 
-        publishLog(buildId, `Downloading ZIP...`);
-        await downloadFile(zipUrl, zipPath);
+        publishLog(buildId, `Fetching repository...`);
+        await downloadFile(fileKey, zipPath);
 
-        publishLog(buildId, `Unzipping files...`);
+        publishLog(buildId, `Preparing files...`);
         await unzip(zipPath, tmpPath);
 
         const extractedDir = join(tmpPath, `${repo}-${defaultBranch}`);

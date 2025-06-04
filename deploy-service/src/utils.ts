@@ -10,6 +10,7 @@ import { createReadStream, createWriteStream } from "fs";
 import unzipper from "unzipper";
 import { redis } from "./redis.ts";
 import stripAnsi from "strip-ansi";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 
 const pipelineAsync = promisify(pipeline);
 
@@ -64,20 +65,21 @@ export async function uploadBuiltFolderToS3(
   await uploadDirectoryToS3(outputDestination, s3Prefix);
 }
 
-export function parseGitHubUrl(url: string) {
-  const match = url.match(/github\.com\/([^/]+)\/([^/]+)(\.git)?/);
-  if (!match) throw new Error("Invalid GitHub URL");
-  return { owner: match[1], repo: match[2].replace(/\.git$/, "") };
-}
+export async function downloadFile(key: string, destPath: string) {
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+  });
 
-export async function downloadFile(url: string, destPath: string) {
-  const res = await fetch(url);
+  const response = await s3.send(command);
+  const stream = response.Body as Readable;
 
-  if (!res.ok)
-    throw new Error(`Failed to download: ${res.status} ${res.statusText}`);
+  if (!stream || typeof stream.pipe !== "function") {
+    throw new Error("S3 response body is not a readable stream");
+  }
 
-  const nodeReadable = Readable.fromWeb(res.body as any);
-  await pipelineAsync(nodeReadable, createWriteStream(destPath));
+  const fileStream = createWriteStream(destPath);
+  await pipelineAsync(stream, fileStream);
 }
 
 export async function unzip(zipPath: string, destPath: string) {
