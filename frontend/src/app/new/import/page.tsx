@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { FaGithub } from "react-icons/fa";
 import { Loader2Icon } from "lucide-react";
 import clsx from "clsx";
+import { toast } from "sonner";
 
 const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
 
@@ -66,6 +67,7 @@ export default function ImportNewRepositoryPage() {
     if (!response.ok) {
       console.error("Failed to deploy");
       setIsDeploying(false);
+      toast.error("Failed to deploy");
       return;
     }
 
@@ -87,6 +89,12 @@ export default function ImportNewRepositoryPage() {
         setIsDeploying(false);
         setIsDeployed(true);
         clearInterval(interval);
+      } else if (data.status === "Failed to Deploy") {
+        setIsDeploying(false);
+        setIsDeployed(false);
+        clearInterval(interval);
+        toast.error("Failed to Deploy");
+        console.error("Failed to Deploy");
       }
     }, 1000);
   }
@@ -125,8 +133,6 @@ export default function ImportNewRepositoryPage() {
     if (!buildId) return;
 
     const sse = new EventSource(`${LOG_SERVICE_URL}/logs/${buildId}`);
-
-    console.log(sse);
 
     sse.onmessage = (e) => {
       if (e.data === "__END__") {

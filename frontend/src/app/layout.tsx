@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SessionProviderWrapper from "@/components/Providers";
 import { Suspense } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { get } from "@vercel/edge-config";
 
@@ -28,7 +29,7 @@ export default async function RootLayout({
 }>) {
   const isDisabled = await get("disabled");
 
-  if (isDisabled) {
+  if (process.env.NODE_ENV === "production" && isDisabled) {
     return (
       <html lang="en">
         <body>🚧 The app is temporarily down for maintenance.</body>
@@ -44,6 +45,7 @@ export default async function RootLayout({
         <Suspense>
           <SessionProviderWrapper>{children}</SessionProviderWrapper>
         </Suspense>
+        <Toaster position="top-right" richColors />
         <Analytics />
       </body>
     </html>

@@ -97,6 +97,7 @@ async function pollSQSForMessages() {
         );
       } catch (err) {
         console.error("❌ Build failed:", err);
+        await setBuildStatus(buildId, `Failed to Deploy`);
         return { statusCode: 500, body: "Build failed: " + err };
       }
     } catch (err) {

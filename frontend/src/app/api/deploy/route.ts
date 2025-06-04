@@ -25,16 +25,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await sqs.send(
-    new SendMessageCommand({
-      QueueUrl: process.env.AWS_SQS_QUEUE_URL,
-      MessageGroupId: session.user.id,
-      MessageDeduplicationId: randomUUID(),
-      MessageBody: JSON.stringify({ ...data, buildId }),
-    })
-  );
+  try {
+    await sqs.send(
+      new SendMessageCommand({
+        QueueUrl: process.env.AWS_SQS_QUEUE_URL,
+        MessageGroupId: session.user.id,
+        MessageDeduplicationId: randomUUID(),
+        MessageBody: JSON.stringify({ ...data, buildId }),
+      })
+    );
 
-  await redis.set(`buildStatus:${buildId}`, "Queued");
-
-  return NextResponse.json({ buildId });
+    await redis.set(`buildStatus:${buildId}`, "Queued");
+    return NextResponse.json({ buildId });
+  } catch (error) {
+    await redis.set(`buildStatus:${buildId}`, "Failed to Deploy");
+    return NextResponse.json({ error: "Failed to deploy" }, { status: 500 });
+  }
 }
