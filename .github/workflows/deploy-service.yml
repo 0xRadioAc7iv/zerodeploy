@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "deploy-service/**"
+      - ".github/workflows/deploy-service.yml"
 
 jobs:
   build-and-push:

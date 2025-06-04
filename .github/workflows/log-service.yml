@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "log-service/**"
+      - ".github/workflows/log-service.yml"
 
 jobs:
   build-and-push:
