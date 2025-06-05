@@ -96,8 +96,14 @@ export function RootDirectoryModal({
             )}
           </div>
 
-          {hasChildren && isExpanded && item.children && (
-            <div>{renderFolderTree(item.children, level + 1)}</div>
+          {hasChildren && item.children && (
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isExpanded ? "max-h-96" : "max-h-0"
+              }`}
+            >
+              {renderFolderTree(item.children, level + 1)}
+            </div>
           )}
         </div>
       );
@@ -127,7 +133,7 @@ export function RootDirectoryModal({
           </div>
         </div>
 
-        <div className="border-t border-gray-800 h-52 overflow-x-auto">
+        <div className="border-t border-gray-800 h-60 overflow-x-auto">
           {renderFolderTree(folderStructure)}
         </div>
 

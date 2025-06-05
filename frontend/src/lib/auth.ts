@@ -1,3 +1,4 @@
+import { saveUserToDB } from "@/app/actions";
 import { Account } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Github from "next-auth/providers/github";
@@ -16,6 +17,13 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET as string,
   callbacks: {
+    async signIn({ user }: { user: any }) {
+      const { error } = await saveUserToDB(user);
+
+      if (error) return false;
+
+      return true;
+    },
     async jwt({
       token,
       account,
@@ -37,5 +45,9 @@ export const authOptions = {
       session.accessToken = token.accessToken;
       return session;
     },
+  },
+  pages: {
+    signIn: "/login",
+    error: "/auth/error",
   },
 };
