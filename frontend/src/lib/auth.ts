@@ -17,6 +17,7 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET as string,
   callbacks: {
+    /* eslint-disable */
     async signIn({ user }: { user: any }) {
       const { error } = await saveUserToDB(user);
 
@@ -29,7 +30,6 @@ export const authOptions = {
       account,
       profile,
     }: {
-      /* eslint-disable */
       token: JWT;
       account?: Account | null;
       profile?: any;
