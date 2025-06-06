@@ -19,21 +19,27 @@ export const authOptions = {
   callbacks: {
     /* eslint-disable */
     async signIn({ user }: { user: any }) {
-      const { error } = await saveUserToDB(user);
+      const { error, userId } = await saveUserToDB(user);
 
       if (error) return false;
 
+      user.savedId = userId;
       return true;
     },
     async jwt({
       token,
+      user,
       account,
       profile,
     }: {
       token: JWT;
+      user: any;
       account?: Account | null;
       profile?: any;
     }) {
+      if (user) {
+        token.savedId = user.savedId;
+      }
       if (account) {
         token.accessToken = account.access_token;
         token.username = profile.login;

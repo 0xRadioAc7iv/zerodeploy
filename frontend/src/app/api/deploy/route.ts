@@ -10,6 +10,8 @@ import { parseGitHubUrl } from "@/lib/utils";
 import { PassThrough } from "stream";
 import { Upload } from "@aws-sdk/lib-storage";
 import fetch from "node-fetch";
+import { getToken } from "next-auth/jwt";
+import { createNewProject } from "@/app/actions";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -17,6 +19,8 @@ export async function POST(request: NextRequest) {
   if (!session || !session.accessToken) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const token = await getToken({ req: request });
 
   const body = await request.json();
   const { data, error } = deployRequestBody.safeParse(body);
@@ -30,7 +34,7 @@ export async function POST(request: NextRequest) {
 
   const buildId = randomUUID();
 
-  const { repoUrl, defaultBranch } = data;
+  const { repoUrl, defaultBranch, projectName } = data;
   const { owner, repo } = parseGitHubUrl(repoUrl);
 
   const zipUrl = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
@@ -50,6 +54,12 @@ export async function POST(request: NextRequest) {
     }
 
     await redis.set(`buildStatus:${buildId}`, "Queued");
+
+    await createNewProject(
+      token?.savedId as string,
+      projectName,
+      `https://github.com/${owner}/${repo}`
+    );
 
     const passThrough = new PassThrough();
     response.body.pipe(passThrough);
@@ -76,11 +86,12 @@ export async function POST(request: NextRequest) {
           repo,
           fileKey,
           defaultBranch,
+          buildId,
           installCommand: data.installCommand,
           buildCommand: data.buildCommand,
           outputDirectory: data.outputDirectory,
           rootDirectory: data.rootDirectory,
-          buildId,
+          projectName: data.projectName,
         }),
       })
     );

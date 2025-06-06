@@ -8,4 +8,5 @@ export const deployRequestBody = z.object({
   buildCommand: z.string(),
   outputDirectory: z.string(),
   rootDirectory: z.string().nonempty(),
+  projectName: z.string().nonempty(),
 });

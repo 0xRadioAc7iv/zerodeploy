@@ -6,3 +6,10 @@ export const usersTable = pgTable("users", {
   email: text().notNull().unique(),
   userAvatarUrl: text().notNull(),
 });
+
+export const projectsTable = pgTable("projects", {
+  id: uuid().primaryKey().defaultRandom(),
+  userId: uuid().references(() => usersTable.id),
+  name: text().notNull(),
+  repository: text().notNull(),
+});

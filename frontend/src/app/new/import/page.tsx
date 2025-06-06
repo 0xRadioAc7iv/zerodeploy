@@ -66,6 +66,9 @@ export default function ImportNewRepositoryPage() {
   const [folderStructure, setFolderStructure] = useState<FolderItem[]>([]);
   const [rootDirectory, setRootDirectory] = useState("./");
 
+  const [projectName, setProjectName] = useState<string>(
+    repoUrl.split("/").splice(3)[1]
+  );
   const [framework, setFramework] = useState<string>("other");
   const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
   const [installCommand, setInstallCommand] = useState("");
@@ -97,6 +100,7 @@ export default function ImportNewRepositoryPage() {
         buildCommand,
         outputDirectory,
         rootDirectory,
+        projectName,
       }),
     });
 
@@ -197,7 +201,7 @@ export default function ImportNewRepositoryPage() {
             Import Repository
           </h1>
           <Card className="shadow-md">
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4">
               {repoUrl && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">
@@ -223,13 +227,20 @@ export default function ImportNewRepositoryPage() {
                 </div>
               )}
 
-              {loading ? (
-                <div className="space-y-3">
-                  {[...Array(3)].map((_, idx) => (
-                    <Skeleton key={idx} className="h-10 w-full rounded-md" />
-                  ))}
+              <div className="text-sm text-muted-foreground">
+                Project Name
+                <div className="mt-2">
+                  <Input
+                    type="text"
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    placeholder="my-project"
+                    className="text-black"
+                  />
                 </div>
-              ) : error ? (
+              </div>
+
+              {error ? (
                 <Alert variant="destructive">
                   <AlertDescription>Error: {error}</AlertDescription>
                 </Alert>
@@ -252,21 +263,28 @@ export default function ImportNewRepositoryPage() {
 
                   <div className="text-sm text-muted-foreground">
                     Root Directory
-                    <div className="flex gap-2 mt-2">
-                      <div className="w-full cursor-not-allowed">
-                        <Input
-                          value={rootDirectory}
-                          className="text-black tracking-wider font-semibold"
-                          disabled
-                        />
+                    {loading ? (
+                      <div className="flex gap-2 mt-2">
+                        <Skeleton className="w-full h-10" />
                       </div>
-                      <Button
-                        className="hover:cursor-pointer"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        Edit
-                      </Button>
-                    </div>
+                    ) : (
+                      <div className="flex gap-2 mt-2">
+                        <div className="w-full cursor-not-allowed">
+                          <Input
+                            value={rootDirectory}
+                            className="text-black tracking-wider font-semibold"
+                            disabled
+                          />
+                        </div>
+                        <Button
+                          className="hover:cursor-pointer"
+                          onClick={() => setIsModalOpen(true)}
+                          disabled={loading}
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   {[
@@ -301,26 +319,32 @@ export default function ImportNewRepositoryPage() {
                     ) => (
                       <div key={idx} className="space-y-2">
                         <Label>{label as string}</Label>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            value={value as string}
-                            onChange={(e) =>
-                              (
-                                setter as React.Dispatch<
-                                  React.SetStateAction<string>
-                                >
-                              )(e.target.value)
-                            }
-                            disabled={!enabled}
-                            placeholder={placeholder as string}
-                          />
-                          <Switch
-                            checked={enabled as boolean}
-                            onCheckedChange={
-                              toggle as (checked: boolean) => void
-                            }
-                          />
-                        </div>
+                        {loading ? (
+                          <div className="flex gap-2 mt-2">
+                            <Skeleton className="w-full h-10" />
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={value as string}
+                              onChange={(e) =>
+                                (
+                                  setter as React.Dispatch<
+                                    React.SetStateAction<string>
+                                  >
+                                )(e.target.value)
+                              }
+                              disabled={!enabled}
+                              placeholder={placeholder as string}
+                            />
+                            <Switch
+                              checked={enabled as boolean}
+                              onCheckedChange={
+                                toggle as (checked: boolean) => void
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                     )
                   )}

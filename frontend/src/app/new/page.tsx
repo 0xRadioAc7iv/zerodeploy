@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Lock } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 type Repo = {
   id: number;
@@ -141,6 +142,10 @@ export default function NewProjectPage() {
             </div>
           )}
         </div>
+      </div>
+      {/* REMOVE THIS BUTTON WHEN DONE */}
+      <div>
+        <Button onClick={() => signOut()}>TEMPORARY Sign Out Button</Button>
       </div>
     </div>
   );
