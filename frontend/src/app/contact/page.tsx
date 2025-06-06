@@ -28,10 +28,10 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-black px-4 py-20 flex flex-col items-center justify-center text-center">
       <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-        Let's Connect
+        Let&apos;s Connect
       </h1>
       <p className="mb-10 text-lg text-gray-400 max-w-md">
-        I'm Manav Gadhiya — passionate about building backend systems &
+        I&apos;m Manav Gadhiya — passionate about building backend systems &
         developer platforms like ZeroDeploy. Feel free to reach out or follow me
         online!
       </p>
