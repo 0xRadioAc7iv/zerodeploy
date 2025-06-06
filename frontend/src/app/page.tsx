@@ -19,9 +19,17 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       <Header />
-      <div className="min-h-screen flex flex-col flex-grow gap-6 items-center justify-center px-4">
-        <LandingTyping />
+      <div className="relative min-h-screen flex flex-col flex-grow gap-6 items-center justify-center px-4 overflow-hidden">
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-[-1]"
+          src="/anim/untitled.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
 
+        <LandingTyping />
         <p className="text-center text-gray-500 text-lg">
           Built for developers who want to ship fast — connect your repo and
           deploy in seconds.
@@ -29,13 +37,12 @@ export default async function Home() {
 
         <div>
           <Button variant="outline" size="lg" className="rounded-full" asChild>
-            <Link href="/login" className="">
+            <Link href="/login">
               <Image
                 src="/logos/main_logo_black.svg"
                 alt="Deploy"
                 width={20}
                 height={20}
-                className=""
               />
               <span className="text-lg font-semibold">Start Deploying</span>
             </Link>
@@ -44,7 +51,7 @@ export default async function Home() {
 
         <a
           href="#demo"
-          className="mt-2 flex flex-col items-center text-sm text-gray-600 hover:text-black transition-colors"
+          className="mt-2 flex flex-col items-center text-sm text-gray-600 hover:text-white transition-colors"
         >
           <div className="flex flex-col items-center gap-[-2px]">
             <ChevronDown
@@ -63,8 +70,8 @@ export default async function Home() {
         </a>
       </div>
 
-      <div id="demo" className="px-4 pb-20 flex justify-center">
-        <div className="w-full max-w-7xl rounded-xl overflow-hidden shadow-lg mt-6">
+      <div id="demo" className="bg-black/95 px-4 pb-20 flex justify-center">
+        <div className="w-full max-w-6xl rounded-xl overflow-hidden shadow-lg mt-24">
           <video
             src="/demo/demo_video.mp4"
             autoPlay
