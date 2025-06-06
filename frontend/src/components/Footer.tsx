@@ -55,7 +55,11 @@ export default function Footer() {
             <h4 className="font-semibold text-lg text-white mb-3">Company</h4>
             <ul className="space-y-2 text-gray-300">
               <li>
-                <Link href="/about" className="hover:underline">
+                <Link
+                  href="https://0xradioactiv.xyz"
+                  target="_blank"
+                  className="hover:underline"
+                >
                   About
                 </Link>
               </li>
@@ -65,7 +69,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="hover:underline">
+                <Link
+                  href="https://radioactiv.hashnode.dev"
+                  target="_blank"
+                  className="hover:underline"
+                >
                   Blog
                 </Link>
               </li>

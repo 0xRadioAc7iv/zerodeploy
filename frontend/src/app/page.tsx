@@ -3,7 +3,6 @@ import Header from "@/components/Header";
 import LandingTyping from "@/components/LandingTyping";
 import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
-import { ChevronDown } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,48 +32,100 @@ export default async function Home() {
         />
 
         <LandingTyping />
-        <p className="text-center text-gray-500 text-lg">
+        <p className="text-lg text-gray-400">
           Built for developers who want to ship fast — connect your repo and
           deploy in seconds.
         </p>
 
-        <div>
-          <Button variant="outline" size="lg" className="rounded-full" asChild>
-            <Link href="/login">
-              <Image
-                src="/logos/main_logo_black.svg"
-                alt="Deploy"
-                width={20}
-                height={20}
-              />
-              <span className="text-lg font-semibold">Start Deploying</span>
-            </Link>
-          </Button>
-        </div>
-
-        <a
-          href="#demo"
-          className="mt-2 flex flex-col items-center text-sm text-gray-600 hover:text-white transition-colors"
+        <Button
+          variant="outline"
+          size="lg"
+          className="rounded-full mt-4 shadow-md hover:shadow-lg transition"
+          asChild
         >
-          <div className="flex flex-col items-center gap-[-2px]">
-            <ChevronDown
-              className="animate-bounce ease-in-out delay-[0ms]"
-              size={20}
+          <Link href="/login">
+            <Image
+              src="/logos/main_logo_black.svg"
+              alt="Deploy"
+              width={20}
+              height={20}
             />
-            <ChevronDown
-              className="animate-bounce ease-in-out delay-[150ms]"
-              size={20}
-            />
-            <ChevronDown
-              className="animate-bounce ease-in-out delay-[300ms]"
-              size={20}
-            />
-          </div>
-        </a>
+            <span className="text-lg font-semibold">Start Deploying</span>
+          </Link>
+        </Button>
       </div>
 
-      <div id="demo" className="bg-black/95 px-4 pb-20 flex justify-center">
-        <div className="w-full max-w-6xl rounded-xl overflow-hidden shadow-lg mt-24">
+      <section className="py-24 px-6 bg-black/95 text-white text-center">
+        <h2 className="text-4xl font-bold mb-6">What is ZeroDeploy?</h2>
+        <p className="max-w-3xl mx-auto text-lg text-gray-300 mb-16">
+          ZeroDeploy is the simplest way to build and deploy frontend apps.
+          Connect your GitHub repo, detect the framework, run builds in secure
+          Docker containers, and host the output on a fast CDN — all without
+          leaving your browser.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto text-left text-sm">
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">
+              Instant GitHub Deploys
+            </h3>
+            <p className="text-gray-400">
+              OAuth-based integration with repo cloning, framework detection,
+              and build triggering.
+            </p>
+          </div>
+
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">
+              Live Logs & Dashboard
+            </h3>
+            <p className="text-gray-400">
+              Monitor real-time logs while your builds run in secure Docker
+              containers on EC2.
+            </p>
+          </div>
+
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">Automatic Domains</h3>
+            <p className="text-gray-400">
+              Every deploy gets a unique, sharable subdomain like{" "}
+              <code>myapp.zerodeploy.xyz</code>.
+            </p>
+          </div>
+
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">Framework Detection</h3>
+            <p className="text-gray-400">Supports Vite. More Coming Soon.</p>
+          </div>
+
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">Built on AWS</h3>
+            <p className="text-gray-400">
+              Fast global CDN via S3 + CloudFront. Secure, scalable, and
+              cost-efficient.
+            </p>
+          </div>
+
+          <div className="bg-white/10 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold mb-2">
+              Developer-First CLI (soon)
+            </h3>
+            <p className="text-gray-400">
+              Deploy directly from your terminal. GitHub webhooks & CLI triggers
+              planned.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div
+        id="demo"
+        className="bg-black/95 px-4 pb-20 pt-20 flex flex-col items-center justify-center"
+      >
+        <div className="text-white text-4xl font-bold mb-10">
+          Watch ZeroDeploy in Action
+        </div>
+        <div className="w-full max-w-5xl rounded-xl overflow-hidden shadow-lg">
           <video
             src="/demo/demo_video.mp4"
             autoPlay
@@ -85,6 +136,24 @@ export default async function Home() {
           />
         </div>
       </div>
+
+      <section className="bg-black/95 text-white py-20 px-6 text-center">
+        <h2 className="text-3xl font-bold mb-4">
+          Ready to Ship Your Next Project?
+        </h2>
+        <p className="text-gray-400 text-lg mb-8">
+          Connect your GitHub repo and get your app live in less than 60
+          seconds.
+        </p>
+        <Button
+          variant="default"
+          size="lg"
+          className="rounded-full bg-white text-black text-base font-semibold hover:bg-gray-200 transition"
+          asChild
+        >
+          <Link href="/login">Start Deploying</Link>
+        </Button>
+      </section>
 
       <Footer />
     </div>

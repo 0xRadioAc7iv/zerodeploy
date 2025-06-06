@@ -6,8 +6,8 @@ import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="w-full sticky top-0 bg-black border-b border-white/10 shadow-sm z-50">
-      <div className="flex items-center justify-between py-4 px-6 md:px-20 mx-auto">
+    <header className="w-full fixed bg-black/70 border-b backdrop-blur-md border-white/10 shadow-sm z-50">
+      <div className="flex items-center justify-between py-4 px-6 md:px-10 mx-auto">
         <div className="flex items-center space-x-14">
           <Link href="/" className="flex items-stretch gap-2">
             <Image
