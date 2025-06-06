@@ -8,6 +8,12 @@ import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { buildOgMetadata } from "@/lib/ogMetadata";
+
+export const generateMetadata = () =>
+  buildOgMetadata({
+    title: "Home",
+  });
 
 export default async function Home() {
   const session = await getServerSession(authOptions);

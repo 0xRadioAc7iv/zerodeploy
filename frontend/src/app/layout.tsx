@@ -19,10 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zerodeploy.xyz"),
-  title: {
-    default: "ZeroDeploy",
-    template: "%s | ZeroDeploy",
-  },
+  title: "ZeroDeploy",
   description: "Because Every Deploy Starts at Zero.",
   openGraph: {
     title: "ZeroDeploy",
