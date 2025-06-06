@@ -6,6 +6,12 @@ import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
+import { buildOgMetadata } from "@/lib/ogMetadata";
+
+export const generateMetadata = () =>
+  buildOgMetadata({
+    title: "Login",
+  });
 
 export default function Login() {
   const [loading, setLoading] = useState(false);

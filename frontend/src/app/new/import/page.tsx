@@ -24,6 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { buildOgMetadata } from "@/lib/ogMetadata";
+
+export const generateMetadata = () =>
+  buildOgMetadata({
+    title: "Import Repository",
+  });
 
 const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
 

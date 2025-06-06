@@ -18,8 +18,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZeroDeploy",
+  metadataBase: new URL("https://zerodeploy.xyz"),
+  title: {
+    default: "ZeroDeploy",
+    template: "%s | ZeroDeploy",
+  },
   description: "Because Every Deploy Starts at Zero.",
+  openGraph: {
+    title: "ZeroDeploy",
+    description: "Because Every Deploy Starts at Zero.",
+    url: new URL("https://zerodeploy.xyz"),
+    siteName: "ZeroDeploy",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default async function RootLayout({

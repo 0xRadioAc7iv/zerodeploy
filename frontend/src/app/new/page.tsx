@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Lock } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { buildOgMetadata } from "@/lib/ogMetadata";
+
+export const generateMetadata = () =>
+  buildOgMetadata({
+    title: "Create New Project",
+  });
 
 type Repo = {
   id: number;

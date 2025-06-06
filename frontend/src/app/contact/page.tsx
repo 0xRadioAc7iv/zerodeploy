@@ -1,5 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import { buildOgMetadata } from "@/lib/ogMetadata";
+
+export const generateMetadata = () =>
+  buildOgMetadata({
+    title: "Contact",
+    description: "Connect with Manav – creator of ZeroDeploy.",
+  });
 
 export default function ContactPage() {
   const contacts = [
