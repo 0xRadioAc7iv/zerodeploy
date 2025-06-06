@@ -2,10 +2,16 @@ export function buildOgMetadata({
   title,
   description = "Because Every Deploy Starts at Zero.",
 }: {
-  title: string;
+  title?: string;
   description?: string;
 }) {
-  const fullTitle = `${title} | ZeroDeploy`;
+  let fullTitle;
+
+  if (title) {
+    fullTitle = `${title} | ZeroDeploy`;
+  } else {
+    fullTitle = "ZeroDeploy";
+  }
 
   return {
     title: fullTitle,
@@ -15,9 +21,9 @@ export function buildOgMetadata({
       description,
       images: [
         {
-          url: `https://zerodeploy.xyz/api/og?title=${encodeURIComponent(
-            title
-          )}`,
+          url: title
+            ? `https://zerodeploy.xyz/api/og?title=${encodeURIComponent(title)}`
+            : "https://zerodeploy.xyz/api/og",
           width: 1200,
           height: 630,
         },
@@ -27,7 +33,9 @@ export function buildOgMetadata({
       card: "summary_large_image",
       title: fullTitle,
       images: [
-        `https://zerodeploy.xyz/api/og?title=${encodeURIComponent(title)}`,
+        title
+          ? `https://zerodeploy.xyz/api/og?title=${encodeURIComponent(title)}`
+          : "https://zerodeploy.xyz/api/og",
       ],
     },
   };

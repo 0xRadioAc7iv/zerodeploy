@@ -10,10 +10,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { buildOgMetadata } from "@/lib/ogMetadata";
 
-export const generateMetadata = () =>
-  buildOgMetadata({
-    title: "Home",
-  });
+export const generateMetadata = () => buildOgMetadata({});
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
