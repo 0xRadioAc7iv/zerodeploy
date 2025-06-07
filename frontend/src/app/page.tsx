@@ -1,12 +1,11 @@
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import LandingPageHeader from "@/components/Header";
 import LandingTyping from "@/components/LandingTyping";
 import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { buildOgMetadata } from "@/lib/ogMetadata";
 import Spline from "@splinetool/react-spline/next";
 
@@ -15,13 +14,9 @@ export const generateMetadata = () => buildOgMetadata({});
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  if (session) {
-    redirect("/new");
-  }
-
   return (
     <div className="flex flex-col">
-      <Header />
+      <LandingPageHeader />
       <div className="relative min-h-screen flex flex-col flex-grow gap-6 items-center justify-center px-4 overflow-hidden">
         {/* CREDITS TO AURORA FOR THE SPLINE DESIGN (https://app.spline.design/@auroregmbt) */}
         <main className="absolute inset-0 w-full h-full pointer-events-auto z-0">
@@ -41,7 +36,7 @@ export default async function Home() {
             className="rounded-full mt-4 shadow-md hover:shadow-lg transition"
             asChild
           >
-            <Link href="/login">
+            <Link href={session ? "/new" : "/login"}>
               <Image
                 src="/logos/main_logo_black.svg"
                 alt="Deploy"
@@ -160,7 +155,7 @@ export default async function Home() {
           className="rounded-full bg-white text-black text-base font-semibold hover:bg-gray-200 transition"
           asChild
         >
-          <Link href="/login">Start Deploying</Link>
+          <Link href={session ? "/new" : "/login"}>Start Deploying</Link>
         </Button>
       </section>
 

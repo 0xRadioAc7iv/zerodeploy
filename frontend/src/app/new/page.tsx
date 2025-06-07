@@ -7,5 +7,9 @@ export const generateMetadata = () =>
   });
 
 export default function NewProjectPage() {
-  return <NewProjectPageClient />;
+  return (
+    <div className="min-h-screen bg-black/95">
+      <NewProjectPageClient />;
+    </div>
+  );
 }

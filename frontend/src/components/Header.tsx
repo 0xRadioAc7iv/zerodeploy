@@ -1,10 +1,23 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Home, LayoutDashboard, LogOut, Settings } from "lucide-react";
+import LogoutButton from "./LogoutButton";
 
-export default function Header() {
+export default async function Header() {
+  const session = await getServerSession(authOptions);
+
   return (
     <header className="w-full sticky top-0 bg-black border-b backdrop-blur-md border-white/10 shadow-sm z-50">
       <div className="flex items-center justify-between py-4 px-6 md:px-10 mx-auto">
@@ -23,12 +36,6 @@ export default function Header() {
           </Link>
 
           {/* <nav className="hidden md:flex items-center space-x-8 text-sm text-gray-500">
-            <Link
-              href="/templates"
-              className="hover:text-black transition-colors font-medium"
-            >
-              Templates
-            </Link>
             <Link
               href="/features"
               className="hover:text-black transition-colors font-medium"
@@ -50,14 +57,94 @@ export default function Header() {
           </nav> */}
         </div>
 
-        <div className="hidden md:flex items-center space-x-3">
-          <Button className="bg-gray-800" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button variant="secondary" asChild>
-            <Link href="/contact">Contact</Link>
-          </Button>
-        </div>
+        {session ? (
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" asChild>
+              <Link href="/contact">Contact</Link>
+            </Button>
+            <Button variant="secondary" asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+            <div className="border border-gray-500 rounded-full cursor-pointer">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="border border-white/20 rounded-full cursor-pointer hover:border-white/40 transition">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={session.user.image} />
+                      <AvatarFallback>
+                        {session.user.name
+                          ?.split(" ")[0][0]
+                          .concat(session.user.name?.split(" ")[1][0])}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 bg-black text-white border border-gray-700 shadow-lg rounded-xl p-2 mt-2"
+                >
+                  <DropdownMenuLabel className="text-white">
+                    <div className="text-base font-semibold">
+                      {session.user.name}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      {session.user.email}
+                    </div>
+                  </DropdownMenuLabel>
+
+                  <Link href="/dashboard">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                      Dashboard
+                      <LayoutDashboard className="w-4 h-4" />
+                    </DropdownMenuItem>
+                  </Link>
+
+                  <Link href="/account">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                      Account Settings
+                      <Settings className="w-4 h-4" />
+                    </DropdownMenuItem>
+                  </Link>
+
+                  <DropdownMenuSeparator className="bg-gray-500" />
+
+                  <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                    <span className="ml-1">Command Menu</span>
+                    <div>
+                      <kbd className="bg-white/10 px-1 py-0.5 rounded text-xs">
+                        Ctrl
+                      </kbd>
+                      <kbd className="bg-white/10 px-1 py-0.5 rounded text-xs">
+                        K
+                      </kbd>
+                    </div>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="bg-gray-500" />
+
+                  <Link href="/">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                      Home Page
+                      <Home className="w-4 h-4" />
+                    </DropdownMenuItem>
+                  </Link>
+
+                  <LogoutButton />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center space-x-3">
+            <Button className="bg-gray-800" asChild>
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button variant="secondary" asChild>
+              <Link href="/contact">Contact</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   );
