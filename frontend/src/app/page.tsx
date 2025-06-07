@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { buildOgMetadata } from "@/lib/ogMetadata";
+import Spline from "@splinetool/react-spline/next";
 
 export const generateMetadata = () => buildOgMetadata({});
 
@@ -22,37 +23,45 @@ export default async function Home() {
     <div className="flex flex-col">
       <Header />
       <div className="relative min-h-screen flex flex-col flex-grow gap-6 items-center justify-center px-4 overflow-hidden">
-        <video
-          className="absolute inset-0 w-full h-full object-cover z-[-1]"
-          src="/anim/untitled.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
+        {/* CREDITS TO AURORA FOR THE SPLINE DESIGN (https://app.spline.design/@auroregmbt) */}
+        <main className="absolute inset-0 w-full h-full pointer-events-auto z-0">
+          <Spline scene="https://prod.spline.design/oDLCN117xsaioDXf/scene.splinecode" />
+        </main>
 
         <LandingTyping />
-        <p className="text-lg text-gray-400">
+        <p className="text-lg text-gray-400 z-2">
           Built for developers who want to ship fast — connect your repo and
           deploy in seconds.
         </p>
 
-        <Button
-          variant="outline"
-          size="lg"
-          className="rounded-full mt-4 shadow-md hover:shadow-lg transition"
-          asChild
-        >
-          <Link href="/login">
-            <Image
-              src="/logos/main_logo_black.svg"
-              alt="Deploy"
-              width={20}
-              height={20}
-            />
-            <span className="text-lg font-semibold">Start Deploying</span>
-          </Link>
-        </Button>
+        <div className="flex gap-4 z-2">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="rounded-full mt-4 shadow-md hover:shadow-lg transition"
+            asChild
+          >
+            <Link href="/login">
+              <Image
+                src="/logos/main_logo_black.svg"
+                alt="Deploy"
+                width={20}
+                height={20}
+              />
+              <span className="text-lg font-semibold">Start Deploying</span>
+            </Link>
+          </Button>
+          <Button
+            size="lg"
+            className="bg-gray-800 rounded-full mt-4 shadow-md hover:shadow-lg transition"
+            asChild
+          >
+            {/* eslint-disable @next/next/no-html-link-for-pages */}
+            <a href="/#demo">
+              <span className="text-lg font-semibold">View Demo</span>
+            </a>
+          </Button>
+        </div>
       </div>
 
       <section className="py-24 px-6 bg-black/95 text-white text-center">

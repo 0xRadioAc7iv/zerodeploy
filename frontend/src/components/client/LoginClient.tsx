@@ -73,44 +73,6 @@ export default function LoginClient() {
                 </>
               )}
             </Button>
-            {/* <Button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 cursor-pointer"
-              aria-label="Sign in with GitHub"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2Icon className="w-5 h-5 animate-spin" />
-                  Logging you in...
-                </>
-              ) : (
-                <>
-                  <FaGitlab className="w-5 h-5" />
-                  Continue with Gitlab
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 cursor-pointer"
-              aria-label="Sign in with GitHub"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2Icon className="w-5 h-5 animate-spin" />
-                  Logging you in...
-                </>
-              ) : (
-                <>
-                  <FaBitbucket className="w-5 h-5" />
-                  Continue with Bitbucket
-                </>
-              )}
-            </Button> */}
 
             {error && (
               <p className="text-sm text-red-600 text-center">{error}</p>

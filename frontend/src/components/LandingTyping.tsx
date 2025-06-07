@@ -17,7 +17,7 @@ export default function LandingTyping() {
   });
 
   return (
-    <div className="text-white text-4xl md:text-6xl font-bold text-center">
+    <div className="text-white text-4xl md:text-6xl font-bold text-center z-2">
       {text}
       <Cursor cursorStyle="|" />
     </div>
