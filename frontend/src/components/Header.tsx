@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Home, LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { Home, LayoutDashboard, Settings } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 
 export default async function Header() {

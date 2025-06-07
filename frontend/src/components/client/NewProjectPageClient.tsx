@@ -83,7 +83,7 @@ export default function NewProjectPageClient() {
   return (
     <div className="flex flex-col items-center">
       <div className="w-full flex flex-col gap-3 text-white items-center pt-4">
-        <div className="text-5xl">Let's build something cool.</div>
+        <div className="text-5xl">Let&apos;s build something cool.</div>
         <div className="text-lg">
           To deploy a new Project, Import an existing Git Repository.
         </div>
