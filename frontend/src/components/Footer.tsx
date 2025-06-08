@@ -29,23 +29,8 @@ export default function Footer() {
             <h4 className="font-semibold text-lg text-white mb-3">Product</h4>
             <ul className="space-y-2 text-gray-300">
               <li>
-                <Link href="/features" className="hover:underline">
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="hover:underline">
-                  Pricing
-                </Link>
-              </li>
-              <li>
                 <Link href="/docs" className="hover:underline">
                   Documentation
-                </Link>
-              </li>
-              <li>
-                <Link href="/templates" className="hover:underline">
-                  Templates
                 </Link>
               </li>
             </ul>

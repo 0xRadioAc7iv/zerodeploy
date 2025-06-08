@@ -9,11 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { FaGithub } from "react-icons/fa";
 import { Loader2Icon } from "lucide-react";
-import clsx from "clsx";
 import { toast } from "sonner";
 import { RootDirectoryModal } from "@/components/RootDirectoryModal";
 import { FolderItem } from "@/lib/interfaces";
@@ -24,30 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import viteLogo from "@/assets/logos/vite.svg";
+import Image from "next/image";
+import BuildOutputSettings from "../BuildOutputSettings";
 
 const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
-
-const frameworkPlaceholders = new Map<
-  string,
-  { installCommand: string; buildCommand: string; outputFolder: string }
->([
-  [
-    "vite",
-    {
-      installCommand: "npm install",
-      buildCommand: "npm run build",
-      outputFolder: "dist",
-    },
-  ],
-  [
-    "other",
-    {
-      installCommand: "npm install",
-      buildCommand: "npm run build",
-      outputFolder: "public",
-    },
-  ],
-]);
 
 export default function ImportNewRepositoryPageClient() {
   const searchParams = useSearchParams();
@@ -73,7 +51,7 @@ export default function ImportNewRepositoryPageClient() {
   const [defaultBranch, setDefaultBranch] = useState<string | null>(null);
   const [installCommand, setInstallCommand] = useState("");
   const [buildCommand, setBuildCommand] = useState("");
-  const [outputDirectory, setOutputDirectory] = useState("dist");
+  const [outputDirectory, setOutputDirectory] = useState("");
 
   const [enableInstall, setEnableInstall] = useState(false);
   const [enableBuild, setEnableBuild] = useState(false);
@@ -190,24 +168,19 @@ export default function ImportNewRepositoryPageClient() {
 
   return (
     <div className="min-h-screen px-4 py-10 flex items-start justify-center">
-      <div
-        className={clsx("transition-all duration-500 flex gap-6 w-full", {
-          "max-w-7xl": logs.length > 0,
-          "max-w-xl": logs.length === 0,
-        })}
-      >
+      <div className="transition-all duration-500 flex gap-6 w-full max-w-2xl">
         <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-6 text-center">
-            Import Repository
-          </h1>
-          <Card className="shadow-md">
+          <Card className="bg-black/80 border-gray-700 border-2 shadow-md">
             <CardContent className="space-y-4">
+              <h1 className="text-2xl text-white font-bold mb-4">
+                New Project
+              </h1>
               {repoUrl && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
+                <div className="bg-gray-800 p-3 rounded-md">
+                  <p className="text-sm text-gray-300 mb-1">
                     Importing from GitHub
                   </p>
-                  <div className="flex text-sm font-medium break-words">
+                  <div className="flex text-sm text-white font-medium break-words">
                     <Link
                       href={repoUrl}
                       target="_blank"
@@ -219,7 +192,7 @@ export default function ImportNewRepositoryPageClient() {
                       </div>
                     </Link>
                     {defaultBranch && (
-                      <Badge variant="outline" className="ml-2 text-xs">
+                      <Badge variant="secondary" className="ml-2 text-xs">
                         branch: {defaultBranch}
                       </Badge>
                     )}
@@ -227,7 +200,7 @@ export default function ImportNewRepositoryPageClient() {
                 </div>
               )}
 
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-gray-300">
                 Project Name
                 <div className="mt-2">
                   <Input
@@ -235,7 +208,7 @@ export default function ImportNewRepositoryPageClient() {
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder="my-project"
-                    className="text-black"
+                    className="border-gray-700 border-2 h-10"
                   />
                 </div>
               </div>
@@ -246,110 +219,82 @@ export default function ImportNewRepositoryPageClient() {
                 </Alert>
               ) : (
                 <div className="space-y-4">
-                  <div className="text-sm text-muted-foreground">
-                    Framework Preset
+                  <div className="text-sm text-white">
+                    <div className="text-gray-300">Framework Preset</div>
                     <div className="mt-2">
                       <Select value={framework} onValueChange={setFramework}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-full border-gray-700 border-2">
                           <SelectValue placeholder="Other" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="vite">Vite</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                        <SelectContent className="bg-black text-gray-300 max-h-60 overflow-y-auto">
+                          <SelectItem value="vite" className="h-10">
+                            <Image
+                              src={viteLogo}
+                              height={20}
+                              width={20}
+                              alt="Vite Logo"
+                            />
+                            Vite
+                          </SelectItem>
+                          <SelectItem value="other" className="h-10">
+                            <Image
+                              src="/logos/main_logo_white.svg"
+                              height={20}
+                              width={20}
+                              alt="Vite Logo"
+                            />
+                            Other
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
-                  <div className="text-sm text-muted-foreground">
-                    Root Directory
-                    {loading ? (
-                      <div className="flex gap-2 mt-2">
-                        <Skeleton className="w-full h-10" />
-                      </div>
-                    ) : (
-                      <div className="flex gap-2 mt-2">
-                        <div className="w-full cursor-not-allowed">
-                          <Input
-                            value={rootDirectory}
-                            className="text-black tracking-wider font-semibold"
-                            disabled
-                          />
-                        </div>
-                        <Button
-                          className="hover:cursor-pointer"
-                          onClick={() => setIsModalOpen(true)}
-                          disabled={loading}
-                        >
-                          Edit
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {[
-                    [
-                      "Install",
-                      installCommand,
-                      setInstallCommand,
-                      enableInstall,
-                      setEnableInstall,
-                      frameworkPlaceholders.get(framework)?.installCommand,
-                    ],
-                    [
-                      "Build",
-                      buildCommand,
-                      setBuildCommand,
-                      enableBuild,
-                      setEnableBuild,
-                      frameworkPlaceholders.get(framework)?.buildCommand,
-                    ],
-                    [
-                      "Output Directory",
-                      outputDirectory,
-                      setOutputDirectory,
-                      enableOutput,
-                      setEnableOutput,
-                      frameworkPlaceholders.get(framework)?.outputFolder,
-                    ],
-                  ].map(
-                    (
-                      [label, value, setter, enabled, toggle, placeholder],
-                      idx
-                    ) => (
-                      <div key={idx} className="space-y-2">
-                        <Label>{label as string}</Label>
+                  <div className="text-sm">
+                    <div className="text-gray-300">Root Directory</div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="w-full cursor-not-allowed">
                         {loading ? (
-                          <div className="flex gap-2 mt-2">
+                          <div className="flex gap-2">
                             <Skeleton className="w-full h-10" />
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              value={value as string}
-                              onChange={(e) =>
-                                (
-                                  setter as React.Dispatch<
-                                    React.SetStateAction<string>
-                                  >
-                                )(e.target.value)
-                              }
-                              disabled={!enabled}
-                              placeholder={placeholder as string}
-                            />
-                            <Switch
-                              checked={enabled as boolean}
-                              onCheckedChange={
-                                toggle as (checked: boolean) => void
-                              }
-                            />
-                          </div>
+                          <Input
+                            value={rootDirectory}
+                            className="text-white disabled:text-white disabled:opacity-100 tracking-wider font-semibold border-gray-700 border-2 h-10"
+                            disabled
+                          />
                         )}
                       </div>
-                    )
-                  )}
+                      <Button
+                        variant="secondary"
+                        className="h-10 hover:cursor-pointer"
+                        onClick={() => setIsModalOpen(true)}
+                        disabled={loading}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+
+                  <BuildOutputSettings
+                    framework={framework}
+                    installCommand={installCommand}
+                    buildCommand={buildCommand}
+                    outputDirectory={outputDirectory}
+                    setInstallCommand={setInstallCommand}
+                    setBuildCommand={setBuildCommand}
+                    setOutputDirectory={setOutputDirectory}
+                    enableInstall={enableInstall}
+                    enableBuild={enableBuild}
+                    enableOutput={enableOutput}
+                    setEnableInstall={setEnableInstall}
+                    setEnableBuild={setEnableBuild}
+                    setEnableOutput={setEnableOutput}
+                  />
 
                   <Button
+                    variant="secondary"
                     onClick={handleDeployRepo}
                     className="w-full mt-2 cursor-pointer"
                     disabled={loading || isDeploying || isDeployed}
@@ -408,6 +353,7 @@ export default function ImportNewRepositoryPageClient() {
 
         <RootDirectoryModal
           isOpen={isModalOpen}
+          repositoryName={repoUrl.split("/").splice(3)[1]}
           onClose={() => setIsModalOpen(false)}
           onContinue={() => setIsModalOpen(false)}
           folderStructure={folderStructure}

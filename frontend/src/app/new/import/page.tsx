@@ -7,5 +7,9 @@ export const generateMetadata = () =>
   });
 
 export default function ImportNewRepositoryPage() {
-  return <ImportNewRepositoryPageClient />;
+  return (
+    <div className="min-h-screen bg-black/95">
+      <ImportNewRepositoryPageClient />;
+    </div>
+  );
 }

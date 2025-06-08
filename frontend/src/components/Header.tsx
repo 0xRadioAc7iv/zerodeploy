@@ -19,8 +19,8 @@ export default async function Header() {
   const session = await getServerSession(authOptions);
 
   return (
-    <header className="w-full sticky top-0 bg-black border-b backdrop-blur-md border-white/10 shadow-sm z-50">
-      <div className="flex items-center justify-between py-4 px-6 md:px-10 mx-auto">
+    <header className="w-full sticky top-0 bg-black border-b border-white/15 shadow-sm z-50">
+      <div className="flex items-center justify-between py-4 px-6 mx-auto">
         <div className="flex items-center space-x-14">
           <Link
             href="/"
@@ -29,28 +29,16 @@ export default async function Header() {
             <Image
               src="/logos/main_logo_white.svg"
               alt="ZeroDeploy"
-              width={25}
-              height={25}
+              width={20}
+              height={20}
               className="align-middle"
             />
-            <span className="text-2xl text-white font-bold leading-none tracking-tight">
+            <span className="text-xl text-white font-bold leading-none tracking-tight">
               ZeroDeploy
             </span>
           </Link>
 
           {/* <nav className="hidden md:flex items-center space-x-8 text-sm text-gray-500">
-            <Link
-              href="/features"
-              className="hover:text-black transition-colors font-medium"
-            >
-              Features
-            </Link>
-            <Link
-              href="/pricing"
-              className="hover:text-black transition-colors font-medium"
-            >
-              Pricing
-            </Link>
             <Link
               href="/docs"
               className="hover:text-black transition-colors font-medium"
@@ -62,24 +50,24 @@ export default async function Header() {
 
         {session ? (
           <div className="flex items-center gap-3">
-            <Button variant="secondary" asChild>
+            <Button variant="secondary" className="h-8" asChild>
               <Link href="/contact" className="select-none">
                 Contact
               </Link>
             </Button>
-            <Button variant="secondary" asChild>
+            <Button variant="secondary" className="h-8" asChild>
               <Link href="/dashboard" className="select-none">
                 Dashboard
               </Link>
             </Button>
-            <div className="border border-gray-500 rounded-full cursor-pointer">
+            <div className="border border-gray-700 rounded-full cursor-pointer">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div
-                    className="border border-white/20 rounded-full cursor-pointer hover:border-white/40 transition select-none"
+                    className="rounded-full cursor-pointer transition select-none"
                     tabIndex={0}
                   >
-                    <Avatar className="h-9 w-9">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={session.user.image} />
                       <AvatarFallback>
                         {session.user.name
@@ -135,10 +123,10 @@ export default async function Header() {
           </div>
         ) : (
           <div className="hidden md:flex items-center space-x-3">
-            <Button className="bg-gray-800" asChild>
+            <Button className="bg-gray-800 h-8" asChild>
               <Link href="/login">Login</Link>
             </Button>
-            <Button variant="secondary" asChild>
+            <Button variant="secondary" className="h-8" asChild>
               <Link href="/contact">Contact</Link>
             </Button>
           </div>

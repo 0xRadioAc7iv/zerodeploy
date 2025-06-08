@@ -16,12 +16,14 @@ import { FolderItem } from "@/lib/interfaces";
 
 export function RootDirectoryModal({
   isOpen = true,
+  repositoryName,
   onClose = () => {},
   onContinue = () => {},
   folderStructure,
   setRootDirectory,
 }: {
   isOpen?: boolean;
+  repositoryName: string;
   onClose?: () => void;
   onContinue?: () => void;
   folderStructure: FolderItem[];
@@ -128,7 +130,7 @@ export function RootDirectoryModal({
           <div className="mt-6 mb-4">
             <div className="flex items-center justify-center gap-2 text-white text-sm font-medium">
               <FaGithub className="w-4 h-4" />
-              E-Commerce-Platform
+              {repositoryName}
             </div>
           </div>
         </div>
