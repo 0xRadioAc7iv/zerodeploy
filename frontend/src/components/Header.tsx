@@ -22,7 +22,10 @@ export default async function Header() {
     <header className="w-full sticky top-0 bg-black border-b backdrop-blur-md border-white/10 shadow-sm z-50">
       <div className="flex items-center justify-between py-4 px-6 md:px-10 mx-auto">
         <div className="flex items-center space-x-14">
-          <Link href="/" className="flex items-stretch gap-2">
+          <Link
+            href="/"
+            className="flex items-stretch gap-2 py-1 focus-visible:outline-2"
+          >
             <Image
               src="/logos/main_logo_white.svg"
               alt="ZeroDeploy"
@@ -60,15 +63,22 @@ export default async function Header() {
         {session ? (
           <div className="flex items-center gap-3">
             <Button variant="secondary" asChild>
-              <Link href="/contact">Contact</Link>
+              <Link href="/contact" className="select-none">
+                Contact
+              </Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard" className="select-none">
+                Dashboard
+              </Link>
             </Button>
             <div className="border border-gray-500 rounded-full cursor-pointer">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="border border-white/20 rounded-full cursor-pointer hover:border-white/40 transition">
+                  <div
+                    className="border border-white/20 rounded-full cursor-pointer hover:border-white/40 transition select-none"
+                    tabIndex={0}
+                  >
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={session.user.image} />
                       <AvatarFallback>
@@ -93,6 +103,8 @@ export default async function Header() {
                     </div>
                   </DropdownMenuLabel>
 
+                  <DropdownMenuSeparator className="bg-gray-500" />
+
                   <Link href="/dashboard">
                     <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
                       Dashboard
@@ -107,28 +119,14 @@ export default async function Header() {
                     </DropdownMenuItem>
                   </Link>
 
-                  <DropdownMenuSeparator className="bg-gray-500" />
-
-                  <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
-                    <span className="ml-1">Command Menu</span>
-                    <div>
-                      <kbd className="bg-white/10 px-1 py-0.5 rounded text-xs">
-                        Ctrl
-                      </kbd>
-                      <kbd className="bg-white/10 px-1 py-0.5 rounded text-xs">
-                        K
-                      </kbd>
-                    </div>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator className="bg-gray-500" />
-
                   <Link href="/">
                     <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
                       Home Page
                       <Home className="w-4 h-4" />
                     </DropdownMenuItem>
                   </Link>
+
+                  <DropdownMenuSeparator className="bg-gray-500" />
 
                   <LogoutButton />
                 </DropdownMenuContent>

@@ -24,12 +24,12 @@ export default async function Home() {
         </main>
 
         <LandingTyping />
-        <p className="text-lg text-gray-400 z-2">
+        <p className="text-lg text-gray-200 z-1">
           Built for developers who want to ship fast — connect your repo and
           deploy in seconds.
         </p>
 
-        <div className="flex gap-4 z-2">
+        <div className="flex gap-4 z-1">
           <Button
             variant="secondary"
             size="lg"
