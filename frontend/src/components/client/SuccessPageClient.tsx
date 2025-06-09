@@ -5,13 +5,41 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
 
 export default function SuccessPageClient() {
   const searchParams = useSearchParams();
 
   const projectName = searchParams.get("project_name");
   const deployedUrl = searchParams.get("deployed_url");
-  const screenshotUrl = searchParams.get("ss_url");
+
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSS = async () => {
+      const response = await fetch("/api/screenshot", {
+        method: "POST",
+        body: JSON.stringify({ url: deployedUrl }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+      if (data.screenshotBase64) {
+        setScreenshot(data.screenshotBase64);
+      }
+    };
+
+    fetchSS();
+  }, [deployedUrl]);
+
+  useEffect(() => {
+    confetti({
+      particleCount: 300,
+      spread: 100,
+      origin: { y: 0 },
+    });
+  }, []);
 
   return (
     <div className="flex flex-col items-center w-full mx-auto">
@@ -28,13 +56,17 @@ export default function SuccessPageClient() {
           </div>
           <div className="py-6 rounded-[3px] overflow-hidden">
             <Link href={deployedUrl!} target="_blank">
-              <Image
-                src={screenshotUrl!}
-                height="500"
-                width="1000"
-                alt="Website Screenshot"
-                className="rounded-[3px]"
-              />
+              {screenshot ? (
+                <Image
+                  src={screenshot}
+                  height={500}
+                  width={1000}
+                  alt="Website Screenshot"
+                  className="rounded-[3px]"
+                />
+              ) : (
+                <div className="w-[1000px] h-[350px] bg-gray-800 animate-pulse rounded-[3px]" />
+              )}
             </Link>
           </div>
           <Button variant="secondary" className="cursor-pointer" asChild>
