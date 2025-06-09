@@ -96,7 +96,7 @@ export default function NewProjectPageClient() {
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-black/80 text-white placeholder-gray-400 border border-white/10 focus:border-white focus:ring-0 focus:outline-none rounded-md pl-10"
+            className="w-full bg-black/80 text-white placeholder-gray-400 border-2 border-gray-800 focus:border-white focus:ring-0 focus:outline-none rounded-md pl-10"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function NewProjectPageClient() {
               {repos.map((repo) => (
                 <Card
                   key={repo.id}
-                  className="bg-black text-white border-gray-800"
+                  className="bg-black text-white border-gray-700 border-2"
                 >
                   <CardContent>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">

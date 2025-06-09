@@ -24,6 +24,7 @@ import {
 import viteLogo from "@/assets/logos/vite.svg";
 import Image from "next/image";
 import BuildOutputSettings from "../BuildOutputSettings";
+import { PiEmptyBold } from "react-icons/pi";
 
 const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
 
@@ -169,7 +170,7 @@ export default function ImportNewRepositoryPageClient() {
   return (
     <div className="min-h-screen px-4 py-10 flex items-start justify-center">
       <div className="transition-all duration-500 flex gap-6 w-full max-w-2xl">
-        <div className="flex-1">
+        <div className="flex flex-col w-full gap-12">
           <Card className="bg-black/80 border-gray-700 border-2 shadow-md">
             <CardContent className="space-y-4">
               <h1 className="text-2xl text-white font-bold mb-4">
@@ -223,11 +224,14 @@ export default function ImportNewRepositoryPageClient() {
                     <div className="text-gray-300">Framework Preset</div>
                     <div className="mt-2">
                       <Select value={framework} onValueChange={setFramework}>
-                        <SelectTrigger className="w-full border-gray-700 border-2">
+                        <SelectTrigger className="w-full border-gray-700 border-2 cursor-pointer">
                           <SelectValue placeholder="Other" />
                         </SelectTrigger>
                         <SelectContent className="bg-black text-gray-300 max-h-60 overflow-y-auto">
-                          <SelectItem value="vite" className="h-10">
+                          <SelectItem
+                            value="vite"
+                            className="h-10 cursor-pointer"
+                          >
                             <Image
                               src={viteLogo}
                               height={20}
@@ -236,13 +240,11 @@ export default function ImportNewRepositoryPageClient() {
                             />
                             Vite
                           </SelectItem>
-                          <SelectItem value="other" className="h-10">
-                            <Image
-                              src="/logos/main_logo_white.svg"
-                              height={20}
-                              width={20}
-                              alt="Vite Logo"
-                            />
+                          <SelectItem
+                            value="other"
+                            className="h-10 cursor-pointer"
+                          >
+                            <PiEmptyBold />
                             Other
                           </SelectItem>
                         </SelectContent>
@@ -331,6 +333,25 @@ export default function ImportNewRepositoryPageClient() {
                   )}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/80 border-gray-700 border-2 pb-0 h-96 shadow-md">
+            <CardContent className="px-0 text-gray-400">
+              <div className="flex flex-col gap-6 pl-6">
+                <div className="text-2xl font-bold">Deployment</div>
+                <div className="text-sm">
+                  Once you&apos;re ready, start deploying to see the progress
+                  here…
+                </div>
+              </div>
+              <Image
+                src="/globe-outline-dark-2.svg"
+                height={200}
+                width={700}
+                alt="Globe Outline"
+                className="rounded-md mt-8"
+              />
             </CardContent>
           </Card>
         </div>

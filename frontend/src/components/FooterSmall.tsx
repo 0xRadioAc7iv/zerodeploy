@@ -15,16 +15,16 @@ export default function FooterSmall() {
           <Link href="/" className="hover:text-white">
             Home
           </Link>
-          {/* <Link href="/docs" className="hover:text-white">
+          <Link href="/docs" className="hover:text-white">
             Docs
-          </Link> */}
+          </Link>
           <Link href="/contact" className="hover:text-white">
             Contact
           </Link>
         </div>
       </div>
 
-      <div className="text-xs text-gray-500 text-center mt-4">
+      <div className="text-xs text-gray-500 mt-4">
         © {new Date().getFullYear()}, ZeroDeploy Inc.
       </div>
     </footer>

@@ -64,22 +64,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          <div>
-            <h4 className="font-semibold text-lg text-white mb-3">Legal</h4>
-            <ul className="space-y-2 text-gray-300">
-              <li>
-                <Link href="/terms" className="hover:underline">
-                  Terms
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:underline">
-                  Privacy
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 

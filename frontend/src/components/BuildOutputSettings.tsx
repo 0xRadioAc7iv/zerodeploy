@@ -97,7 +97,7 @@ export default function BuildOutputSettings({
       <div
         ref={contentRef}
         className="px-3 overflow-hidden transition-all duration-300 ease-in-out"
-        style={{ height: isOpen ? `${height + 10}px` : `${height}px` }}
+        style={{ height: isOpen ? `${height + 12}px` : `${height}px` }}
       >
         <div className="flex flex-col gap-3">
           <div className="space-y-3 pt-2">
