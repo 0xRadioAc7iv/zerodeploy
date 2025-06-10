@@ -86,13 +86,9 @@ export async function getUserProjects(userId: string) {
       .from(projectsTable)
       .where(eq(projectsTable.userId, userId));
 
-    if (projects.length > 0) {
-      return { error: true, msg: "Reached Max Projects Limits", status: 400 };
-    }
-
-    return { error: false };
+    return { error: false, projects };
   } catch (error) {
     console.error("Error fetching user projects: ", error);
-    return { error: true, msg: error, status: 500 };
+    return { error: true, projects: null };
   }
 }

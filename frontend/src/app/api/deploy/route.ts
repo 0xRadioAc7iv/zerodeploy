@@ -22,14 +22,22 @@ export async function POST(request: NextRequest) {
 
   const token = await getToken({ req: request });
 
-  const {
-    error: limitError,
-    msg,
-    status,
-  } = await getUserProjects(token?.savedId as string);
+  const { error: limitError, projects } = await getUserProjects(
+    token?.savedId as string
+  );
 
   if (limitError) {
-    return NextResponse.json({ msg }, { status });
+    return NextResponse.json(
+      { msg: "Error fetching user projects" },
+      { status: 500 }
+    );
+  }
+
+  if (projects!.length > 0) {
+    return NextResponse.json(
+      { error: true, msg: "Reached Max Projects Limit" },
+      { status: 400 }
+    );
   }
 
   const body = await request.json();
