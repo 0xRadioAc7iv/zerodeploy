@@ -9,7 +9,11 @@ export const usersTable = pgTable("users", {
 
 export const projectsTable = pgTable("projects", {
   id: uuid().primaryKey().defaultRandom(),
-  userId: uuid().references(() => usersTable.id),
+  userId: uuid()
+    .references(() => usersTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   name: text().notNull(),
   repository: text().notNull(),
 });

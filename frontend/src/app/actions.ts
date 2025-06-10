@@ -2,6 +2,9 @@ import { db } from "@/lib/db";
 import { projectsTable, usersTable } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 
+const GH_CLID = process.env.GITHUB_CLIENT_ID as string;
+const GH_CLSC = process.env.GITHUB_CLIENT_SECRET as string;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function saveUserToDB(user: any) {
   const { name, image, email } = user;
@@ -29,7 +32,7 @@ export async function saveUserToDB(user: any) {
   }
 }
 
-export async function deleteUserAccount(email: string) {
+export async function deleteUserAccount(email: string, accessToken: string) {
   try {
     const [data] = await db
       .select()
@@ -37,6 +40,21 @@ export async function deleteUserAccount(email: string) {
       .where(eq(usersTable.email, email));
 
     if (!data.email) return { error: true, msg: "User not found", status: 404 };
+
+    await fetch(`https://api.github.com/applications/${GH_CLID}/grant`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${GH_CLID}:${GH_CLSC}`).toString(
+          "base64"
+        )}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+      }),
+    });
 
     await db.delete(usersTable).where(eq(usersTable.email, email));
 
@@ -58,5 +76,23 @@ export async function createNewProject(
   } catch (error) {
     console.error("Error creating project: ", error);
     return { error: true, msg: error };
+  }
+}
+
+export async function getUserProjects(userId: string) {
+  try {
+    const projects = await db
+      .select()
+      .from(projectsTable)
+      .where(eq(projectsTable.userId, userId));
+
+    if (projects.length > 0) {
+      return { error: true, msg: "Reached Max Projects Limits", status: 400 };
+    }
+
+    return { error: false };
+  } catch (error) {
+    console.error("Error fetching user projects: ", error);
+    return { error: true, msg: error, status: 500 };
   }
 }

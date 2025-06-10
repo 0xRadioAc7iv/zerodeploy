@@ -122,10 +122,15 @@ export default function ImportNewRepositoryPageClient() {
       }),
     });
 
+    const resData = await response.json();
+
     if (!response.ok) {
       console.error("Failed to deploy");
       setIsDeploying(false);
-      toast.error("Failed to deploy");
+      toast.error("Failed to deploy", {
+        description:
+          resData.msg || "There was an error while deploying your project",
+      });
       return;
     }
 

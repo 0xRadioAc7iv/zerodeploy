@@ -11,7 +11,7 @@ import { PassThrough } from "stream";
 import { Upload } from "@aws-sdk/lib-storage";
 import fetch from "node-fetch";
 import { getToken } from "next-auth/jwt";
-import { createNewProject } from "@/app/actions";
+import { createNewProject, getUserProjects } from "@/app/actions";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -21,6 +21,16 @@ export async function POST(request: NextRequest) {
   }
 
   const token = await getToken({ req: request });
+
+  const {
+    error: limitError,
+    msg,
+    status,
+  } = await getUserProjects(token?.savedId as string);
+
+  if (limitError) {
+    return NextResponse.json({ msg }, { status });
+  }
 
   const body = await request.json();
   const { data, error } = deployRequestBody.safeParse(body);

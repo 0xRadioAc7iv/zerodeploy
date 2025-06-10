@@ -1,6 +1,7 @@
 import { deleteUserAccount } from "@/app/actions";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -13,7 +14,15 @@ export async function POST(req: NextRequest) {
   const { email } = await req.json();
 
   try {
-    const { error, msg, status } = await deleteUserAccount(email);
+    const { error, msg, status } = await deleteUserAccount(
+      email,
+      session.accessToken
+    );
+
+    const cookieStore = await cookies();
+
+    cookieStore.delete("next-auth.csrf-token");
+    cookieStore.delete("next-auth.callback-url");
 
     if (!error) {
       return NextResponse.json({ success: true });
