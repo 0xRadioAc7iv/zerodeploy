@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,20 +53,23 @@ export default function NewProjectPageClient() {
     setLoading(false);
   }
 
-  async function searchRepos(query: string) {
-    if (!query.trim()) {
-      setRepos(originalRepos);
-      return;
-    }
+  const searchRepos = useCallback(
+    async (query: string) => {
+      if (!query.trim()) {
+        setRepos(originalRepos);
+        return;
+      }
 
-    setLoading(true);
-    const res = await fetch(
-      `/api/github/search?query=${encodeURIComponent(query)}`
-    );
-    const data = await res.json();
-    setRepos(data);
-    setLoading(false);
-  }
+      setLoading(true);
+      const res = await fetch(
+        `/api/github/search?query=${encodeURIComponent(query)}`
+      );
+      const data = await res.json();
+      setRepos(data);
+      setLoading(false);
+    },
+    [originalRepos]
+  );
 
   useEffect(() => {
     fetchRepos();
@@ -78,7 +81,7 @@ export default function NewProjectPageClient() {
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [search]);
+  }, [search, searchRepos]);
 
   return (
     <div className="flex flex-col items-center">

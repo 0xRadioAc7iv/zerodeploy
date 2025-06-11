@@ -225,7 +225,7 @@ export default function ImportNewRepositoryPageClient() {
         projectName
       )}&deployed_url=${encodeURIComponent(deploymentState.split(":::")[1])}`
     );
-  }, [deploymentState]);
+  }, [deploymentState, projectName]);
 
   return (
     <div className="min-h-screen px-4 py-10 flex items-start justify-center">
@@ -515,7 +515,7 @@ export default function ImportNewRepositoryPageClient() {
                     {isDeploying ? (
                       <div className="flex items-center">
                         <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
-                        Deploying...
+                        Deploying
                       </div>
                     ) : isDeployed ? (
                       "Deployed"

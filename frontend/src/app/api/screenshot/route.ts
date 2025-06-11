@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       screenshotBase64: `data:image/jpeg;base64,${base64}`,
     });
-    /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (error) {
     console.log(error);
     return NextResponse.json(

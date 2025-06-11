@@ -80,7 +80,7 @@ export default async function Header() {
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-64 bg-black text-white border border-gray-700 shadow-lg rounded-xl p-2 mt-2"
+                  className="w-64 bg-black text-white border-2 border-gray-700 shadow-lg rounded-xl p-2 mt-2"
                 >
                   <DropdownMenuLabel className="text-white">
                     <div className="text-base font-semibold">
