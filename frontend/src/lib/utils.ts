@@ -72,3 +72,19 @@ export function generateFolderStructure(
 
   return folderMap["."] ? [folderMap["."]] : [];
 }
+
+export async function sendEmail(
+  type: string,
+  fullName: string,
+  recipient: string
+) {
+  try {
+    await fetch(process.env.EMAIL_WORKER_URL!, {
+      method: "POST",
+      body: JSON.stringify({ type, fullName, recipient }),
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Failed to send email: ", error);
+  }
+}

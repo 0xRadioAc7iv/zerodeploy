@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { projectsTable, usersTable } from "@/lib/schema";
+import { sendEmail } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 
 const GH_CLID = process.env.GITHUB_CLIENT_ID as string;
@@ -20,7 +21,13 @@ export async function saveUserToDB(user: any) {
     const [newUser] = await db
       .insert(usersTable)
       .values({ email, fullName: name, userAvatarUrl: image })
-      .returning({ id: usersTable.id });
+      .returning({
+        id: usersTable.id,
+        fullName: usersTable.fullName,
+        email: usersTable.email,
+      });
+
+    await sendEmail("accountCreated", newUser.fullName, newUser.email);
 
     return { error: false, userId: newUser.id };
   } catch (error) {
@@ -56,7 +63,12 @@ export async function deleteUserAccount(email: string, accessToken: string) {
       }),
     });
 
-    await db.delete(usersTable).where(eq(usersTable.email, email));
+    const [deletedUser] = await db
+      .delete(usersTable)
+      .where(eq(usersTable.email, email))
+      .returning({ fullName: usersTable.fullName, email: usersTable.email });
+
+    await sendEmail("accountDeleted", deletedUser.fullName, deletedUser.email);
 
     return { error: false, msg: "Successfully deleted!", status: 201 };
   } catch (error) {
