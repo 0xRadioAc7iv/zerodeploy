@@ -87,12 +87,14 @@ async function pollSQSForMessages() {
           if (useNpm) install = "npm install";
           else if (useYarn) install = "yarn install";
           else if (usePnpm) install = "pnpm install";
+          else install = "npm install";
         }
 
         if (!build) {
           if (useNpm) build = "npm run build";
           else if (useYarn) build = "yarn build";
-          else if (usePnpm) build = "pnpm build";
+          else if (usePnpm) build = "pnpm run build";
+          else build = "npm run build";
         }
 
         publishLog(buildId, `Installing dependencies...`);

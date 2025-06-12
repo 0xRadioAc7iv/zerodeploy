@@ -134,8 +134,7 @@ export default function ImportNewRepositoryPageClient() {
       return;
     }
 
-    const data = await response.json();
-    const id = data.buildId;
+    const id = resData.buildId;
     setBuildId(id);
     pollStatus(id);
   }

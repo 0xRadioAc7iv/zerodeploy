@@ -15,13 +15,22 @@ export const AWS_CREDENTIALS_SECRET_KEY = env
   .required()
   .asString();
 
-export const AWS_S3_BUCKET_NAME = env
-  .get("AWS_S3_BUCKET_NAME")
+export const AWS_SQS_QUEUE_URL = env
+  .get("AWS_SQS_QUEUE_URL")
   .required()
   .asString();
 
-export const AWS_SQS_QUEUE_URL = env
-  .get("AWS_SQS_QUEUE_URL")
+export const CLOUDFLARE_ACCOUNT_ID = env
+  .get("CLOUDFLARE_ACCOUNT_ID")
+  .required()
+  .asString();
+
+export const R2_BUCKET_NAME = env.get("R2_BUCKET_NAME").required().asString();
+
+export const R2_ACCESS_ID = env.get("R2_ACCESS_ID").required().asString();
+
+export const R2_SECRET_ACCESS_KEY = env
+  .get("R2_SECRET_ACCESS_KEY")
   .required()
   .asString();
 

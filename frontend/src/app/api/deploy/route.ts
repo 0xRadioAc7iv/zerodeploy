@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import { s3, sqs } from "@/lib/aws";
+import { sqs } from "@/lib/aws";
 import { deployRequestBody } from "@/lib/zod";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import { getServerSession } from "next-auth";
@@ -12,12 +12,13 @@ import { Upload } from "@aws-sdk/lib-storage";
 import fetch from "node-fetch";
 import { getToken } from "next-auth/jwt";
 import { createNewProject, getUserProjects } from "@/app/actions";
+import { r2 } from "@/lib/cloudflare";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.accessToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
   }
 
   const token = await getToken({ req: request });
@@ -83,9 +84,9 @@ export async function POST(request: NextRequest) {
     response.body.pipe(passThrough);
 
     const upload = new Upload({
-      client: s3,
+      client: r2,
       params: {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Bucket: process.env.R2_BUCKET_NAME,
         Key: fileKey,
         Body: passThrough,
         ContentType: "application/zip",
@@ -115,8 +116,8 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json({ buildId });
-    /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (error) {
+    console.error(error);
     await redis.set(`buildStatus:${buildId}`, "Failed to Deploy");
     return NextResponse.json({ error: "Failed to deploy" }, { status: 500 });
   }

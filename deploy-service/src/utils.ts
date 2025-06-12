@@ -1,6 +1,4 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3 } from "./aws.ts";
-import { AWS_S3_BUCKET_NAME } from "./env.ts";
 import path, { dirname, join } from "path";
 import { readdir, readFile } from "fs/promises";
 import { pipeline, Readable } from "stream";
@@ -11,6 +9,8 @@ import unzipper from "unzipper";
 import { redis } from "./redis.ts";
 import stripAnsi from "strip-ansi";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { r2 } from "./cloudflare.ts";
+import { R2_BUCKET_NAME } from "./env.ts";
 
 const pipelineAsync = promisify(pipeline);
 
@@ -45,9 +45,9 @@ async function uploadDirectoryToS3(localDir: string, s3Prefix: string) {
     } else {
       const fileContent = await readFile(fullPath);
 
-      await s3.send(
+      await r2.send(
         new PutObjectCommand({
-          Bucket: AWS_S3_BUCKET_NAME,
+          Bucket: R2_BUCKET_NAME,
           Key: s3Key,
           Body: fileContent,
           ContentType: getContentType(entry.name),
@@ -67,11 +67,11 @@ export async function uploadBuiltFolderToS3(
 
 export async function downloadFile(key: string, destPath: string) {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Bucket: R2_BUCKET_NAME,
     Key: key,
   });
 
-  const response = await s3.send(command);
+  const response = await r2.send(command);
   const stream = response.Body as Readable;
 
   if (!stream || typeof stream.pipe !== "function") {

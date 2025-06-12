@@ -1,0 +1,18 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "subdomain-router",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-06-12",
+	"observability": {
+		"enabled": true
+	},
+
+	"routes": ["*.zerodeploy.xyz/*"],
+	"r2_buckets": [
+		{
+			"binding": "DEPLOY_BUCKET",
+			"bucket_name": "zerodeploy-repo-bucket",
+			"preview_bucket_name": "zerodeploy-repo-bucket"
+		}
+	]
+}
