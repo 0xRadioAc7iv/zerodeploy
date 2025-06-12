@@ -16,23 +16,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
         working-directory: subdomain-router
 
       - name: Install Wrangler
-        run: pnpm add -g wrangler
+        run: npm i -g wrangler
 
       - name: Deploy to Cloudflare Workers
         run: wrangler deploy
