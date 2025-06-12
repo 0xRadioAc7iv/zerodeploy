@@ -29,11 +29,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        working-directory: email-worker
 
       - name: Install Wrangler
         run: pnpm add -g wrangler
 
       - name: Deploy to Cloudflare Workers
         run: wrangler deploy
+        working-directory: email-worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
