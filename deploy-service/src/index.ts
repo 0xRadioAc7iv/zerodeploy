@@ -12,6 +12,7 @@ import {
   sendEmail,
   setBuildStatus,
   unzip,
+  updateProjectMetadata,
   uploadBuiltFolderToS3,
 } from "./utils.ts";
 import { mkdir, rm } from "fs/promises";
@@ -49,6 +50,7 @@ async function pollSQSForMessages() {
         buildId,
         rootDirectory,
         userEmail,
+        projectId,
       } = JSON.parse(message.Body as string);
 
       const tmpPath = join(tmpdir(), `repo-${Date.now()}`);
@@ -125,10 +127,10 @@ async function pollSQSForMessages() {
 
         publishLog(buildId, "Exiting build process...");
 
-        await setBuildStatus(
-          buildId,
-          `Deployed:::https://${repo}.zerodeploy.xyz`
-        );
+        const deployedUrl = `Deployed:::https://${repo}.zerodeploy.xyz`;
+
+        await setBuildStatus(buildId, deployedUrl);
+        await updateProjectMetadata(projectId, deployedUrl.split(":::")[1]);
       } catch (err) {
         console.error("❌ Build failed:", err);
         sendEmail("deployFailed", buildId, userEmail);

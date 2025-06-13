@@ -74,11 +74,19 @@ export async function POST(request: NextRequest) {
 
     await redis.set(`buildStatus:${buildId}`, "Queued");
 
-    await createNewProject(
+    const result = await createNewProject(
       token?.savedId as string,
       projectName,
       `https://github.com/${owner}/${repo}`
     );
+
+    if (result.error) {
+      console.error(result.msg);
+      return NextResponse.json(
+        { error: "Error creating a new project" },
+        { status: 500 }
+      );
+    }
 
     const passThrough = new PassThrough();
     response.body.pipe(passThrough);
@@ -112,6 +120,7 @@ export async function POST(request: NextRequest) {
           rootDirectory: data.rootDirectory,
           projectName: data.projectName,
           userEmail: token!.email,
+          projectId: result.projectId,
         }),
       })
     );

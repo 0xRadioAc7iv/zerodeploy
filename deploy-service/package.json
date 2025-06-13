@@ -17,7 +17,9 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.817.0",
     "@aws-sdk/client-sqs": "^3.817.0",
+    "@neondatabase/serverless": "^1.0.1",
     "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.44.2",
     "env-var": "^7.5.0",
     "fastify": "^5.3.3",
     "redis": "^5.1.1",

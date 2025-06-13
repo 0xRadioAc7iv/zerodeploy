@@ -11,6 +11,9 @@ import stripAnsi from "strip-ansi";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { r2 } from "./cloudflare.ts";
 import { EMAIL_WORKER_URL, R2_BUCKET_NAME } from "./env.ts";
+import { db } from "./db.ts";
+import { projectsTable } from "./schema.ts";
+import { eq } from "drizzle-orm";
 
 const pipelineAsync = promisify(pipeline);
 
@@ -154,5 +157,21 @@ export async function sendEmail(
     });
   } catch (error) {
     console.error("Failed to send email: ", error);
+  }
+}
+
+export async function updateProjectMetadata(
+  projectId: string,
+  deployedUrl: string
+) {
+  try {
+    await db
+      .update(projectsTable)
+      .set({ deployedUrl })
+      .where(eq(projectsTable.id, projectId));
+    return { error: false };
+  } catch (error) {
+    console.error("Error creating project: ", error);
+    return { error: true, msg: error };
   }
 }

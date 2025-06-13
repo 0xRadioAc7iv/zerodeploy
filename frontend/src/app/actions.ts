@@ -81,10 +81,15 @@ export async function createNewProject(
   userId: string,
   name: string,
   repository: string
-): Promise<{ error: boolean; msg?: unknown }> {
+): Promise<
+  { error: false; projectId: string } | { error: true; msg: unknown }
+> {
   try {
-    await db.insert(projectsTable).values({ userId, name, repository });
-    return { error: false };
+    const [newProject] = await db
+      .insert(projectsTable)
+      .values({ userId, name, repository })
+      .returning({ id: projectsTable.id });
+    return { error: false, projectId: newProject.id };
   } catch (error) {
     console.error("Error creating project: ", error);
     return { error: true, msg: error };
