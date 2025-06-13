@@ -94,21 +94,21 @@ export default async function Header() {
                   <DropdownMenuSeparator className="bg-gray-500" />
 
                   <Link href="/dashboard">
-                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300">
                       Dashboard
                       <LayoutDashboard className="w-4 h-4" />
                     </DropdownMenuItem>
                   </Link>
 
                   <Link href="/account">
-                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300">
                       Account Settings
                       <Settings className="w-4 h-4" />
                     </DropdownMenuItem>
                   </Link>
 
                   <Link href="/">
-                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300 hover:bg-gray-800">
+                    <DropdownMenuItem className="flex justify-between cursor-pointer transition-colors duration-300">
                       Home Page
                       <Home className="w-4 h-4" />
                     </DropdownMenuItem>

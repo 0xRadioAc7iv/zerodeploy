@@ -199,7 +199,6 @@ export default function ImportNewRepositoryPageClient() {
         return;
       }
       if (e.data !== "ping") setLogs((prev) => [...prev, e.data]);
-      logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     sse.onerror = (e) => {
@@ -209,6 +208,12 @@ export default function ImportNewRepositoryPageClient() {
 
     return () => sse.close();
   }, [buildId]);
+
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logs]);
 
   useEffect(() => {
     if (contentRef.current) {

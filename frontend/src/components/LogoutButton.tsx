@@ -7,7 +7,7 @@ import { LogOut } from "lucide-react";
 export default function LogoutButton() {
   return (
     <DropdownMenuItem
-      className="flex justify-between cursor-pointer text-red-400 hover:text-red-500 transition-colors duration-300 hover:bg-gray-800"
+      className="flex justify-between cursor-pointer text-red-500 transition-colors duration-300"
       onClick={() => signOut()}
     >
       Log out
