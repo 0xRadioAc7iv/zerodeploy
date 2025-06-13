@@ -18,7 +18,8 @@ export default {
 			});
 		}
 
-		let body: { recipient?: string; fullName?: string; type?: string };
+		let body: { recipient: string; fullName?: string; buildId?: string; type: string };
+
 		try {
 			body = await request.json();
 		} catch (err) {
@@ -30,7 +31,7 @@ export default {
 
 		const { recipient, fullName, type } = body;
 
-		if (!recipient || !fullName || !type) {
+		if (((type === 'accountCreated' || type === 'accountDeleted') && !fullName) || (type === 'deployFailed' && !body.buildId)) {
 			return new Response(JSON.stringify({ error: 'Missing required fields' }), {
 				status: 400,
 				headers: { 'Content-Type': 'application/json', ...corsHeaders() },
@@ -38,8 +39,9 @@ export default {
 		}
 
 		const subject = {
-			accountCreated: `Welcome to ZeroDeploy!`,
+			accountCreated: 'Welcome to ZeroDeploy!',
 			accountDeleted: `Goodbye from ZeroDeploy, ${fullName}`,
+			deployFailed: 'Deployment Failed',
 		}[type];
 
 		const html = {
@@ -62,6 +64,16 @@ export default {
           <p style="font-size:16px;color:#444;">Your ZeroDeploy account has been deleted. All associated data and deployments have been removed.</p>
         </div>
       `,
+
+			deployFailed: `
+	    <div style="font-family:Segoe UI,Roboto,sans-serif;max-width:600px;margin:0 auto;padding:32px;border:1px solid #eaeaea;border-radius:8px;background-color:#ffffff;">
+	      <h2 style="color:#b91c1c;">🚨 Deployment Failed</h2>
+	      <p style="font-size:16px;color:#444;">Your deployment <strong>${body.buildId}</strong> on ZeroDeploy did not complete successfully.</p>
+	      <p style="font-size:16px;color:#444;">Possible reasons include build errors, misconfigurations, or missing files.</p>
+	      <p style="font-size:16px;color:#444;">Please check the logs and try redeploying once the issue is resolved.</p>
+	      <a href="https://zerodeploy.xyz/dashboard/builds/${body.buildId}" style="display:inline-block;margin-top:16px;padding:10px 20px;background-color:#b91c1c;color:#fff;border-radius:4px;text-decoration:none;">View Build Logs</a>
+	    </div>
+	  `,
 		}[type];
 
 		if (!subject || !html) {

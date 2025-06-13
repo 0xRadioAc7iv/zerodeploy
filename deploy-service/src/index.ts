@@ -9,6 +9,7 @@ import {
   downloadFile,
   publishLog,
   runCommand,
+  sendEmail,
   setBuildStatus,
   unzip,
   uploadBuiltFolderToS3,
@@ -47,6 +48,7 @@ async function pollSQSForMessages() {
         outputDirectory,
         buildId,
         rootDirectory,
+        userEmail,
       } = JSON.parse(message.Body as string);
 
       const tmpPath = join(tmpdir(), `repo-${Date.now()}`);
@@ -129,8 +131,8 @@ async function pollSQSForMessages() {
         );
       } catch (err) {
         console.error("❌ Build failed:", err);
+        sendEmail("deployFailed", buildId, userEmail);
         await setBuildStatus(buildId, `Failed to Deploy`);
-        return { statusCode: 500, body: "Build failed: " + err };
       }
     } catch (err) {
       console.error("Error polling SQS:", err);

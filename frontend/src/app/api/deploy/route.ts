@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
           outputDirectory: data.outputDirectory,
           rootDirectory: data.rootDirectory,
           projectName: data.projectName,
+          userEmail: token!.email,
         }),
       })
     );

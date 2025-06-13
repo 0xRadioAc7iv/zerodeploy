@@ -10,7 +10,7 @@ import { redis } from "./redis.ts";
 import stripAnsi from "strip-ansi";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { r2 } from "./cloudflare.ts";
-import { R2_BUCKET_NAME } from "./env.ts";
+import { EMAIL_WORKER_URL, R2_BUCKET_NAME } from "./env.ts";
 
 const pipelineAsync = promisify(pipeline);
 
@@ -139,4 +139,20 @@ export async function runCommand(
       }
     });
   });
+}
+
+export async function sendEmail(
+  type: string,
+  buildId: string,
+  recipient: string
+) {
+  try {
+    await fetch(EMAIL_WORKER_URL, {
+      method: "POST",
+      body: JSON.stringify({ type, buildId, recipient }),
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Failed to send email: ", error);
+  }
 }

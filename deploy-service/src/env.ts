@@ -34,6 +34,11 @@ export const R2_SECRET_ACCESS_KEY = env
   .required()
   .asString();
 
+export const EMAIL_WORKER_URL = env
+  .get("EMAIL_WORKER_URL")
+  .required()
+  .asString();
+
 export const REDIS_HOST_URL = env.get("REDIS_HOST_URL").required().asString();
 
 export const REDIS_PORT = env.get("REDIS_PORT").required().asPortNumber();
