@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { FolderItem } from "./interfaces";
+import { env } from "@/env";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -79,7 +80,7 @@ export async function sendEmail(
   recipient: string
 ) {
   try {
-    await fetch(process.env.EMAIL_WORKER_URL!, {
+    await fetch(env.EMAIL_WORKER_URL, {
       method: "POST",
       body: JSON.stringify({ type, fullName, recipient }),
       headers: { "Content-Type": "application/json" },

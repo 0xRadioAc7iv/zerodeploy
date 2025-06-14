@@ -1,8 +1,9 @@
+import { env } from "@/env";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const API_KEY = process.env.SCREENSHOTONE_ACCESS_KEY as string;
+const API_KEY = env.SCREENSHOTONE_ACCESS_KEY as string;
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);

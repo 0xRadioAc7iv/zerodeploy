@@ -32,6 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { env } from "@/env";
 
 const frameworkPlaceholders = new Map<
   string,
@@ -55,7 +56,7 @@ const frameworkPlaceholders = new Map<
   ],
 ]);
 
-const LOG_SERVICE_URL = process.env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
+const LOG_SERVICE_URL = env.NEXT_PUBLIC_LOG_SERVICE_URL as string;
 
 export default function ImportNewRepositoryPageClient() {
   const searchParams = useSearchParams();

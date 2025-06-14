@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { get } from "@vercel/edge-config";
+import { env } from "@/env";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,7 @@ export default async function RootLayout({
 }>) {
   const isDisabled = await get("disabled");
 
-  if (process.env.NODE_ENV === "production" && isDisabled) {
+  if (env.NODE_ENV === "production" && isDisabled) {
     return (
       <html lang="en">
         <body>🚧 The app is temporarily down for maintenance.</body>

@@ -1,4 +1,5 @@
 import { saveUserToDB } from "@/app/actions";
+import { env } from "@/env";
 import { Account } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Github from "next-auth/providers/github";
@@ -6,8 +7,8 @@ import Github from "next-auth/providers/github";
 export const authOptions = {
   providers: [
     Github({
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
       authorization: {
         params: {
           scope: "read:user user:email repo",
@@ -15,7 +16,7 @@ export const authOptions = {
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET as string,
+  secret: env.NEXTAUTH_SECRET,
   callbacks: {
     /* eslint-disable */
     async signIn({ user }: { user: any }) {

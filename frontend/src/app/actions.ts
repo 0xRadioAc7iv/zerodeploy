@@ -1,10 +1,11 @@
+import { env } from "@/env";
 import { db } from "@/lib/db";
 import { projectsTable, usersTable } from "@/lib/schema";
 import { sendEmail } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 
-const GH_CLID = process.env.GITHUB_CLIENT_ID as string;
-const GH_CLSC = process.env.GITHUB_CLIENT_SECRET as string;
+const GH_CLID = env.GITHUB_CLIENT_ID;
+const GH_CLSC = env.GITHUB_CLIENT_SECRET;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function saveUserToDB(user: any) {

@@ -13,6 +13,7 @@ import fetch from "node-fetch";
 import { getToken } from "next-auth/jwt";
 import { createNewProject, getUserProjects } from "@/app/actions";
 import { r2 } from "@/lib/cloudflare";
+import { env } from "@/env";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     const upload = new Upload({
       client: r2,
       params: {
-        Bucket: process.env.R2_BUCKET_NAME,
+        Bucket: env.R2_BUCKET_NAME,
         Key: fileKey,
         Body: passThrough,
         ContentType: "application/zip",
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     await sqs.send(
       new SendMessageCommand({
-        QueueUrl: process.env.AWS_SQS_QUEUE_URL,
+        QueueUrl: env.AWS_SQS_QUEUE_URL,
         MessageGroupId: session.user.id,
         MessageDeduplicationId: randomUUID(),
         MessageBody: JSON.stringify({
