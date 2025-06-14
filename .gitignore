@@ -7,9 +7,6 @@ dist
 .out
 build
 
-# Drizzle
-drizzle/
-
 next-env.d.ts
 
 # Environment Variables

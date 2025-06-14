@@ -6,12 +6,14 @@ import {
 } from "@aws-sdk/client-sqs";
 import { AWS_SQS_QUEUE_URL } from "./env.ts";
 import {
+  createNewDeployment,
   downloadFile,
   publishLog,
   runCommand,
   sendEmail,
   setBuildStatus,
   unzip,
+  updateDeploymentMetadata,
   updateProjectMetadata,
   uploadBuiltFolderToS3,
 } from "./utils.ts";
@@ -58,8 +60,14 @@ async function pollSQSForMessages() {
 
       const zipPath = join(tmpPath, `${owner}-${repo}-${defaultBranch}.zip`);
 
+      const start = Date.now();
+      let end;
+
       try {
-        await setBuildStatus(buildId, "Deploying...");
+        await Promise.all([
+          createNewDeployment(buildId, projectId),
+          setBuildStatus(buildId, "Deploying..."),
+        ]);
 
         publishLog(buildId, `Fetching repository...`);
         await downloadFile(fileKey, zipPath);
@@ -113,28 +121,39 @@ async function pollSQSForMessages() {
 
         await uploadBuiltFolderToS3(join(rootDir, outputDirectory), repo);
 
-        await rm(tmpPath, {
-          recursive: true,
-          force: true,
-        });
-
-        await sqs.send(
-          new DeleteMessageCommand({
-            QueueUrl: AWS_SQS_QUEUE_URL,
-            ReceiptHandle: message.ReceiptHandle!,
-          })
-        );
+        await Promise.all([
+          rm(tmpPath, {
+            recursive: true,
+            force: true,
+          }),
+          sqs.send(
+            new DeleteMessageCommand({
+              QueueUrl: AWS_SQS_QUEUE_URL,
+              ReceiptHandle: message.ReceiptHandle!,
+            })
+          ),
+        ]);
 
         publishLog(buildId, "Exiting build process...");
 
         const deployedUrl = `Deployed:::https://${repo}.zerodeploy.xyz`;
 
-        await setBuildStatus(buildId, deployedUrl);
-        await updateProjectMetadata(projectId, deployedUrl.split(":::")[1]);
+        end = Date.now();
+
+        await Promise.all([
+          setBuildStatus(buildId, deployedUrl),
+          updateProjectMetadata(projectId, deployedUrl.split(":::")[1]),
+          updateDeploymentMetadata(buildId, "success", end - start),
+        ]);
       } catch (err) {
+        end = Date.now();
         console.error("❌ Build failed:", err);
-        sendEmail("deployFailed", buildId, userEmail);
-        await setBuildStatus(buildId, `Failed to Deploy`);
+
+        await Promise.all([
+          setBuildStatus(buildId, `Failed to Deploy`),
+          updateDeploymentMetadata(buildId, "failed", end - start),
+          sendEmail("deployFailed", buildId, userEmail),
+        ]);
       }
     } catch (err) {
       console.error("Error polling SQS:", err);

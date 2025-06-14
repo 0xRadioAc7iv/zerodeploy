@@ -12,7 +12,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { r2 } from "./cloudflare.ts";
 import { EMAIL_WORKER_URL, R2_BUCKET_NAME } from "./env.ts";
 import { db } from "./db.ts";
-import { projectsTable } from "./schema.ts";
+import { deploymentsTable, projectsTable } from "./schema.ts";
 import { eq } from "drizzle-orm";
 
 const pipelineAsync = promisify(pipeline);
@@ -174,4 +174,22 @@ export async function updateProjectMetadata(
     console.error("Error creating project: ", error);
     return { error: true, msg: error };
   }
+}
+
+export async function createNewDeployment(buildId: string, projectId: string) {
+  await db.insert(deploymentsTable).values({ id: buildId, projectId });
+}
+
+export async function updateDeploymentMetadata(
+  buildId: string,
+  status: string,
+  timeDiff: number
+) {
+  const timeToReady = Math.floor(timeDiff / 1000);
+  const updatedAt = new Date(timeDiff);
+
+  await db
+    .update(deploymentsTable)
+    .set({ status, timeToReady, updatedAt })
+    .where(eq(deploymentsTable.id, buildId));
 }
