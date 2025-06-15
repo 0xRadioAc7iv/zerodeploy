@@ -27,9 +27,19 @@ jobs:
 
       - name: Install Wrangler
         run: npm i -g wrangler
+        working-directory: subdomain-router
+
+      - name: Write .env from secrets
+        run: |
+          echo "KV_BINDING_ID=${{ secrets.KV_BINDING_ID }}" >> .env
+        working-directory: subdomain-router
+
+      - name: Make deploy.sh executable (just in case)
+        run: chmod +x deploy.sh
+        working-directory: subdomain-router
 
       - name: Deploy to Cloudflare Workers
-        run: wrangler deploy
+        run: ./deploy.sh
         working-directory: subdomain-router
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
