@@ -2,7 +2,7 @@ import { env } from "@/env";
 import { db } from "@/lib/db";
 import { projectsTable, usersTable } from "@/lib/schema";
 import { sendEmail } from "@/lib/utils";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 const GH_CLID = env.GITHUB_CLIENT_ID;
 const GH_CLSC = env.GITHUB_CLIENT_SECRET;
@@ -108,5 +108,37 @@ export async function getUserProjects(userId: string) {
   } catch (error) {
     console.error("Error fetching user projects: ", error);
     return { error: true, projects: null };
+  }
+}
+
+export async function getProjectData(
+  projectId: string,
+  userId: string
+): Promise<
+  | {
+      error: false;
+      project: {
+        id: string;
+        userId: string;
+        name: string;
+        repository: string;
+        deployedUrl: string | null;
+        createdAt: Date | null;
+      };
+    }
+  | { error: true; project: null }
+> {
+  try {
+    const [project] = await db
+      .select()
+      .from(projectsTable)
+      .where(
+        and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId))
+      );
+
+    return { error: false, project };
+  } catch (error) {
+    console.error("Error fetching user project data: ", error);
+    return { error: true, project: null };
   }
 }
