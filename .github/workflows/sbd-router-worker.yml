@@ -31,7 +31,7 @@ jobs:
 
       - name: Write .env from secrets
         run: |
-          echo "KV_BINDING_ID=${{ secrets.KV_BINDING_ID }}" >> .env
+          echo "KV_NAMESPACE_ID=${{ secrets.KV_BINDING_ID }}" >> .env
         working-directory: subdomain-router
 
       - name: Make deploy.sh executable (just in case)
