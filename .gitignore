@@ -12,4 +12,6 @@ next-env.d.ts
 # Environment Variables
 .env
 
+wrangler.jsonc
+
 TODO.md

@@ -8,11 +8,19 @@
 	},
 
 	"routes": ["*.zerodeploy.xyz/*"],
+
 	"r2_buckets": [
 		{
 			"binding": "DEPLOY_BUCKET",
 			"bucket_name": "zerodeploy-repo-bucket",
 			"preview_bucket_name": "zerodeploy-repo-bucket"
+		}
+	],
+
+	"kv_namespaces": [
+		{
+			"binding": "KV_BINDING",
+			"id": "$KV_NAMESPACE_ID"
 		}
 	]
 }

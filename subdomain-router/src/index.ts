@@ -5,7 +5,27 @@ export default {
 		const subdomain = host.split('.')[0];
 		let uri = url.pathname;
 
+		// Maintenance Mode check
 		if (subdomain && subdomain !== 'www' && subdomain !== 'site') {
+			const maintenanceKey = `maintenance:${subdomain}`;
+			const inMaintenance = await env.KV_BINDING.get(maintenanceKey);
+
+			if (inMaintenance === 'true') {
+				const maintenancePage = await env.DEPLOY_BUCKET.get('maintenance.html');
+
+				if (!maintenancePage) {
+					return new Response('Under Maintenance', { status: 503 });
+				}
+
+				return new Response(maintenancePage.body, {
+					status: 503,
+					headers: {
+						'Content-Type': 'text/html',
+						'Cache-Control': 'no-store',
+					},
+				});
+			}
+
 			const prefix = `/builds/${subdomain}`;
 
 			if (!uri.startsWith(prefix)) {
@@ -70,16 +90,11 @@ function getMimeType(path: string) {
 }
 
 function getCacheHeaders(path: string): Record<string, string> {
-	// Long cache for static assets
 	if (/\.(js|css|png|jpg|jpeg|gif|svg|woff2|ttf|eot|otf)$/.test(path)) {
-		return { 'Cache-Control': 'public, immutable, max-age=31536000' }; // 1 year
+		return { 'Cache-Control': 'public, immutable, max-age=31536000' };
 	}
-
-	// Shorter cache for HTML or JSON content
 	if (path.endsWith('.html') || path.endsWith('.json')) {
-		return { 'Cache-Control': 'public, max-age=300' }; // 5 minutes
+		return { 'Cache-Control': 'public, max-age=300' };
 	}
-
-	// Default cache
-	return { 'Cache-Control': 'public, max-age=3600' }; // 1 hour
+	return { 'Cache-Control': 'public, max-age=3600' };
 }
